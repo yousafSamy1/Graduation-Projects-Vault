@@ -463,11 +463,11 @@ export default function EditProjectPage({ params }) {
               </div>
 
               <div className="input-group">
-                <label htmlFor="ta" style={{ color: '#0f172a', fontWeight: 800 }}>Teaching Assistant / TA (المعيد)</label>
+                <label htmlFor="ta" style={{ color: '#0f172a', fontWeight: 800 }}>Teaching Assistants / TAs (المعيدين)</label>
                 <input
                   type="text"
                   className="input"
-                  placeholder="Eng. / Mr. / Ms. ..."
+                  placeholder="e.g. Eng. Ahmed & Eng. Sara (يمكن إضافة أكثر من معيد)"
                   value={form.ta}
                   onChange={(e) => updateField('ta', e.target.value)}
                   id="ta"
@@ -478,16 +478,21 @@ export default function EditProjectPage({ params }) {
 
             {/* Team Members with Contacts */}
             <div style={{ background: '#f8fafc', border: '2px solid #cbd5e1', borderRadius: '1rem', padding: '1.25rem', marginBottom: '1.5rem' }}>
-              <label style={{ color: '#0f172a', fontWeight: 900, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem' }}>
-                <UserCheck size={18} style={{ color: '#059669' }} />
-                Team Members & Contact Info (أعضاء الفريق ووسائل التواصل)
-              </label>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ color: '#0f172a', fontWeight: 900, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <UserCheck size={18} style={{ color: '#059669' }} />
+                  Team Members & Contact Info (أعضاء الفريق ووسائل التواصل)
+                </label>
+                <p style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 700, marginTop: '2px' }}>
+                  💡 الاسم فقط هو الإجباري، وكل وسائل التواصل اختيارية لكل طالب حسب توفرها.
+                </p>
+              </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <input
                   type="text"
                   className="input"
-                  placeholder="Student Name *"
+                  placeholder="Student Name * (اسم الطالب)"
                   value={studentForm.name}
                   onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
@@ -495,7 +500,7 @@ export default function EditProjectPage({ params }) {
                 <input
                   type="url"
                   className="input"
-                  placeholder="LinkedIn URL"
+                  placeholder="LinkedIn (optional - اختياري)"
                   value={studentForm.linkedin}
                   onChange={(e) => setStudentForm({ ...studentForm, linkedin: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
@@ -503,7 +508,7 @@ export default function EditProjectPage({ params }) {
                 <input
                   type="url"
                   className="input"
-                  placeholder="GitHub URL"
+                  placeholder="GitHub (optional - اختياري)"
                   value={studentForm.github}
                   onChange={(e) => setStudentForm({ ...studentForm, github: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
@@ -511,7 +516,7 @@ export default function EditProjectPage({ params }) {
                 <input
                   type="email"
                   className="input"
-                  placeholder="Email"
+                  placeholder="Email (optional - اختياري)"
                   value={studentForm.email}
                   onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
@@ -519,7 +524,7 @@ export default function EditProjectPage({ params }) {
                 <input
                   type="text"
                   className="input"
-                  placeholder="Phone / WhatsApp"
+                  placeholder="Phone / WhatsApp (optional - اختياري)"
                   value={studentForm.phone}
                   onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
@@ -527,7 +532,7 @@ export default function EditProjectPage({ params }) {
                 <input
                   type="url"
                   className="input"
-                  placeholder="Portfolio / Website URL"
+                  placeholder="Portfolio / Website (optional - اختياري)"
                   value={studentForm.portfolio}
                   onChange={(e) => setStudentForm({ ...studentForm, portfolio: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
