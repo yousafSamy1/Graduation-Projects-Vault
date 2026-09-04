@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import SearchBar from '@/components/SearchBar';
 import ProjectCard from '@/components/ProjectCard';
 import Footer from '@/components/Footer';
-import { Search, GitCompareArrows, ArrowRight, Award } from 'lucide-react';
+import { Search, GitCompareArrows, ArrowRight, Award, Calendar } from 'lucide-react';
 
 const DEPARTMENTS = [
   { id: 'MIS', nameEn: 'Management Information Systems', nameAr: 'نظم المعلومات الإدارية', color: '#dc2626', icon: '💻' },
@@ -16,6 +17,7 @@ const DEPARTMENTS = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const [stats, setStats] = useState({ total: 0, departments: 4, years: 0, supervisors: 0 });
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -123,43 +125,49 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Browse By Academic Year Quick Partition Bar */}
+            {/* Browse By Academic Year Dropdown Picker */}
             <div className="animate-fade-in-up" style={{
-              background: '#ffffff',
-              border: '2px solid #cbd5e1',
-              borderRadius: '1rem',
-              padding: '1rem 1.25rem',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.75rem',
-              flexWrap: 'wrap',
-              boxShadow: '0 4px 15px rgba(15, 23, 42, 0.06)'
+              background: '#ffffff',
+              border: '2px solid #cbd5e1',
+              borderRadius: '9999px',
+              padding: '8px 22px',
+              boxShadow: '0 4px 15px rgba(15, 23, 42, 0.08)',
+              flexWrap: 'wrap'
             }}>
-              <span style={{ fontWeight: 900, color: '#0f172a', fontSize: '0.95rem' }}>
-                📅 Browse by Year / تصفح حسب السنة:
-              </span>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                {yearsList.map((y) => (
-                  <Link
-                    key={y}
-                    href={`/search?year=${y}`}
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: '9999px',
-                      background: '#f1f5f9',
-                      border: '1.5px solid #cbd5e1',
-                      color: '#1e3a8a',
-                      fontWeight: 800,
-                      fontSize: '0.88rem',
-                      textDecoration: 'none',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    {y}
-                  </Link>
-                ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 800, fontSize: '0.92rem' }}>
+                <Calendar size={18} style={{ color: '#dc2626' }} />
+                <span>Filter Archive by Academic Year / اختر السنة الدراسية:</span>
               </div>
+              <select
+                onChange={(e) => {
+                  if (e.target.value) {
+                    router.push(`/search?year=${e.target.value}`);
+                  }
+                }}
+                defaultValue=""
+                style={{
+                  padding: '6px 18px',
+                  borderRadius: '9999px',
+                  border: '2px solid #1e3a8a',
+                  background: '#f8fafc',
+                  color: '#1e3a8a',
+                  fontWeight: 900,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  outline: 'none',
+                  boxShadow: '0 2px 8px rgba(30, 58, 138, 0.1)'
+                }}
+                id="homepage-year-picker"
+              >
+                <option value="" disabled>📅 Select Year / اختر السنة...</option>
+                {yearsList.map((y) => (
+                  <option key={y} value={y}>🎓 Class of {y} ({y})</option>
+                ))}
+              </select>
             </div>
 
           </div>
