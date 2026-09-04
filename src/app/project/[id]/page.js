@@ -159,7 +159,7 @@ export default function ProjectDetailPage({ params }) {
               )}
               {project.ta && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <GraduationCap size={15} style={{ color: '#059669' }} /> TA (المعيد): {project.ta}
+                  <GraduationCap size={15} style={{ color: '#059669' }} /> TA: {project.ta}
                 </span>
               )}
               {project.rating > 0 && (

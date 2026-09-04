@@ -433,7 +433,7 @@ export default function AddProjectPage() {
               </div>
 
               <div className="input-group">
-                <label htmlFor="ta" style={{ color: '#0f172a', fontWeight: 800 }}>Teaching Assistants / TAs (المعيدين)</label>
+                <label htmlFor="ta" style={{ color: '#0f172a', fontWeight: 800 }}>Teaching Assistant / TA</label>
                 <input
                   type="text"
                   className="input"
