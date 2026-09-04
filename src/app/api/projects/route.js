@@ -128,6 +128,84 @@ export async function POST(request) {
   }
 }
 
+// PUT - Update an existing project (Admin only)
+export async function PUT(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const body = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 });
+    }
+
+    let embedding = undefined;
+    try {
+      const combinedText = combineTextForEmbedding(body);
+      if (combinedText && combinedText.trim().length > 0) {
+        embedding = await generateEmbedding(combinedText);
+      }
+    } catch (embError) {
+      console.warn('Embedding update skipped or failed:', embError.message);
+    }
+
+    const studentNames = body.students_details && body.students_details.length > 0
+      ? body.students_details.map((s) => typeof s === 'string' ? s : s.name).filter(Boolean)
+      : (body.students || []);
+
+    const updateData = {
+      project_code: body.project_code || null,
+      title_en: body.title_en || null,
+      title_ar: body.title_ar || null,
+      abstract_en: body.abstract_en || null,
+      abstract_ar: body.abstract_ar || null,
+      year: body.year,
+      department: body.department,
+      students: studentNames,
+      students_details: body.students_details || [],
+      supervisor: body.supervisor || null,
+      ta: body.ta || null,
+      keywords: body.keywords || [],
+      pdf_url: body.pdf_url || null,
+      rating: body.rating || 0,
+    };
+
+    if (embedding !== undefined) {
+      updateData.embedding = embedding;
+    }
+
+    let supabase = createServerSupabaseClient();
+    let { data, error } = await supabase
+      .from('projects')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error && (error.message?.includes('Invalid API key') || error.code === 'PGRST301')) {
+      supabase = createPublicSupabaseClient();
+      const res = await supabase
+        .from('projects')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+      data = res.data;
+      error = res.error;
+    }
+
+    if (error) {
+      console.error('Update project error:', error);
+      return NextResponse.json({ error: error.message || 'Failed to update project' }, { status: 500 });
+    }
+
+    return NextResponse.json({ project: data });
+  } catch (err) {
+    console.error('Projects PUT error:', err);
+    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
+  }
+}
+
 // DELETE - Delete a project (Admin only)
 export async function DELETE(request) {
   try {

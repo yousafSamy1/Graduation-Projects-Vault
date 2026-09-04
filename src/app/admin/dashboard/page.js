@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Plus, Trash2, LogOut, Search, Loader, FolderOpen, Download } from 'lucide-react';
+import { Plus, Trash2, LogOut, Search, Loader, FolderOpen, Download, Edit } from 'lucide-react';
 
 const departmentBadgeClass = {
   'MIS': 'badge-mis',
@@ -174,6 +174,15 @@ export default function AdminDashboard() {
                       <td style={{ padding: '1rem', fontWeight: 700, color: '#0f172a' }}>{project.students?.length || 0}</td>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <Link
+                            href={`/admin/dashboard/edit/${project.id}`}
+                            className="btn btn-ghost btn-sm"
+                            title="Edit project"
+                            id={`edit-${project.id}`}
+                            style={{ color: '#1e3a8a' }}
+                          >
+                            <Edit size={14} />
+                          </Link>
                           {project.pdf_url && (
                             <a
                               href={project.pdf_url}
