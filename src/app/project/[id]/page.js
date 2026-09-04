@@ -196,49 +196,52 @@ export default function ProjectDetailPage({ params }) {
               <h2 style={{ fontSize: '1.2rem', color: '#0f172a', fontWeight: 900, marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Users size={20} style={{ color: '#059669' }} /> Team Members (أعضاء الفريق)
               </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
                 {teamMembers.map((member, i) => (
                   <div
                     key={i}
                     style={{
-                      background: '#f8fafc',
-                      border: '2px solid #cbd5e1',
-                      borderRadius: '0.88rem',
-                      padding: '1.1rem 1.25rem',
-                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
+                      background: '#ffffff',
+                      border: '1.5px solid #e2e8f0',
+                      borderRadius: '1rem',
+                      padding: '1.25rem',
+                      boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.06)',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      gap: '0.75rem'
+                      gap: '0.85rem',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{
-                        width: '38px',
-                        height: '38px',
+                        width: '44px',
+                        height: '44px',
                         borderRadius: '50%',
-                        background: '#e2e8f0',
-                        color: '#1e3a8a',
+                        background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                        color: '#ffffff',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontWeight: 900,
-                        fontSize: '1rem'
+                        fontSize: '1.1rem',
+                        boxShadow: '0 4px 10px rgba(30, 58, 138, 0.25)',
+                        flexShrink: 0
                       }}>
                         {member.name ? member.name.charAt(0).toUpperCase() : 'S'}
                       </div>
-                      <div>
-                        <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.05rem' }}>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.05rem', truncate: true, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {member.name || 'Team Member'}
                         </div>
-                        <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700 }}>
+                        <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700, marginTop: '2px' }}>
                           Student Developer
                         </div>
                       </div>
                     </div>
 
                     {/* Contact Icons Bar */}
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.5rem', borderTop: '1px solid #e2e8f0' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.75rem', borderTop: '1px solid #f1f5f9' }}>
                       {member.linkedin && (
                         <a
                           href={member.linkedin}
@@ -248,15 +251,16 @@ export default function ProjectDetailPage({ params }) {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            padding: '4px 10px',
-                            background: '#0077b515',
-                            border: '1px solid #0077b540',
-                            borderRadius: '6px',
+                            gap: '5px',
+                            padding: '6px 12px',
+                            background: '#0077b512',
+                            border: '1px solid #0077b530',
+                            borderRadius: '8px',
                             color: '#0077b5',
                             fontSize: '0.78rem',
                             fontWeight: 800,
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           <LinkedInIcon size={14} /> LinkedIn
@@ -272,15 +276,16 @@ export default function ProjectDetailPage({ params }) {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            padding: '4px 10px',
-                            background: '#1e293b15',
-                            border: '1px solid #1e293b40',
-                            borderRadius: '6px',
+                            gap: '5px',
+                            padding: '6px 12px',
+                            background: '#0f172a10',
+                            border: '1px solid #0f172a30',
+                            borderRadius: '8px',
                             color: '#0f172a',
                             fontSize: '0.78rem',
                             fontWeight: 800,
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           <GitHubIcon size={14} /> GitHub
@@ -294,15 +299,16 @@ export default function ProjectDetailPage({ params }) {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            padding: '4px 10px',
-                            background: '#dc262615',
-                            border: '1px solid #dc262640',
-                            borderRadius: '6px',
+                            gap: '5px',
+                            padding: '6px 12px',
+                            background: '#dc262612',
+                            border: '1px solid #dc262630',
+                            borderRadius: '8px',
                             color: '#dc2626',
                             fontSize: '0.78rem',
                             fontWeight: 800,
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           <EmailIcon size={14} /> Email
@@ -318,15 +324,16 @@ export default function ProjectDetailPage({ params }) {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            padding: '4px 10px',
-                            background: '#05966915',
-                            border: '1px solid #05966940',
-                            borderRadius: '6px',
+                            gap: '5px',
+                            padding: '6px 12px',
+                            background: '#05966912',
+                            border: '1px solid #05966930',
+                            borderRadius: '8px',
                             color: '#059669',
                             fontSize: '0.78rem',
                             fontWeight: 800,
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           <PhoneIcon size={14} /> Contact
@@ -342,15 +349,16 @@ export default function ProjectDetailPage({ params }) {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            padding: '4px 10px',
-                            background: '#2563eb15',
-                            border: '1px solid #2563eb40',
-                            borderRadius: '6px',
+                            gap: '5px',
+                            padding: '6px 12px',
+                            background: '#2563eb12',
+                            border: '1px solid #2563eb30',
+                            borderRadius: '8px',
                             color: '#2563eb',
                             fontSize: '0.78rem',
                             fontWeight: 800,
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           <GlobeIcon size={14} /> Website

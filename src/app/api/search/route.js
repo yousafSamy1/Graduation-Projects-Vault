@@ -16,11 +16,10 @@ export async function GET(request) {
       .from('projects')
       .select('*', { count: 'exact' });
 
-    // Apply text search
+    // Apply text search across title, abstract, supervisor, project_code, and TA
     if (query.trim()) {
-      // Use ilike for flexible search that works with both Arabic and English
       dbQuery = dbQuery.or(
-        `title_en.ilike.%${query}%,title_ar.ilike.%${query}%,abstract_en.ilike.%${query}%,abstract_ar.ilike.%${query}%,supervisor.ilike.%${query}%`
+        `title_en.ilike.%${query}%,title_ar.ilike.%${query}%,abstract_en.ilike.%${query}%,abstract_ar.ilike.%${query}%,supervisor.ilike.%${query}%,project_code.ilike.%${query}%,ta.ilike.%${query}%`
       );
     }
 

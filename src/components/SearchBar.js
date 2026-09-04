@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function SearchBar({ 
-  placeholder = 'Search projects by title, keywords, abstract...', 
+  placeholder = 'Search projects by title, code (e.g. MIS-25/26-2), keywords...', 
   size = 'default',
   onSearch,
   initialValue = '' 

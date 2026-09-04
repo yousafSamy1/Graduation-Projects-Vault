@@ -130,7 +130,7 @@ function SearchPageContent() {
               <input
                 type="text"
                 className="search-input"
-                placeholder="Search by title, abstract, keyword... | ابحث بالعنوان أو الملخص..."
+                placeholder="Search by title, code (e.g. MIS-25/26-2), abstract... | ابحث بالعنوان، كود المشروع، أو الملخص..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 id="search-page-input"
