@@ -56,6 +56,25 @@ function SearchPageContent() {
     doSearch(q, dept, yr, 1);
   }, [searchParams, doSearch]);
 
+  // Dynamic live search on text input typing (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const urlQ = searchParams.get('q') || '';
+      if (query !== urlQ) {
+        const params = new URLSearchParams(searchParams.toString());
+        if (query.trim()) {
+          params.set('q', query.trim());
+        } else {
+          params.delete('q');
+        }
+        params.set('page', '1');
+        router.replace(`/search?${params.toString()}`, { scroll: false });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query, router, searchParams]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
