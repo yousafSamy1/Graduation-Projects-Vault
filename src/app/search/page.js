@@ -201,46 +201,13 @@ function SearchPageContent() {
               ))}
             </select>
 
-            {/* Quick Year Partition Pills */}
-            <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'wrap', marginLeft: 'auto' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748b' }}>Quick Year:</span>
-              {[2026, 2025, 2024, 2023].map((y) => (
-                <button
-                  key={y}
-                  type="button"
-                  onClick={() => {
-                    const newYr = y.toString() === year ? '' : y.toString();
-                    setYear(newYr);
-                    const params = new URLSearchParams();
-                    if (query) params.set('q', query);
-                    if (department) params.set('department', department);
-                    if (newYr) params.set('year', newYr);
-                    router.push(`/search?${params.toString()}`);
-                  }}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    border: '1.5px solid',
-                    borderColor: year === y.toString() ? '#1e3a8a' : '#cbd5e1',
-                    background: year === y.toString() ? '#1e3a8a' : '#f8fafc',
-                    color: year === y.toString() ? '#ffffff' : '#0f172a',
-                    fontSize: '0.8rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  {y}
-                </button>
-              ))}
-            </div>
-
             {(query || department || year) && (
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
                 onClick={clearFilters}
                 id="clear-filters-btn"
+                style={{ marginLeft: 'auto' }}
               >
                 <X size={14} />
                 Clear
