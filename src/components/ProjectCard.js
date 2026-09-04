@@ -52,12 +52,15 @@ export default function ProjectCard({ project, index = 0 }) {
               {project.supervisor}
             </span>
           )}
-          {project.students && project.students.length > 0 && (
-            <span style={{ color: '#334155', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <BookOpen size={14} />
-              {project.students.length} student{project.students.length > 1 ? 's' : ''}
-            </span>
-          )}
+          {(() => {
+            const count = Math.max(project.students?.length || 0, project.students_details?.length || 0);
+            return count > 0 ? (
+              <span style={{ color: '#334155', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <BookOpen size={14} />
+                {count} student{count > 1 ? 's' : ''}
+              </span>
+            ) : null;
+          })()}
           <span style={{ marginLeft: 'auto', color: '#1e3a8a', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             View <ArrowRight size={14} />
           </span>

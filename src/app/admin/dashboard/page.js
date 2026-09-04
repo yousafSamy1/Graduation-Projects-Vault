@@ -171,7 +171,9 @@ export default function AdminDashboard() {
                       </td>
                       <td style={{ padding: '1rem', fontWeight: 700, color: '#0f172a' }}>{project.year}</td>
                       <td style={{ padding: '1rem', fontWeight: 700, color: '#0f172a' }}>{project.supervisor || '—'}</td>
-                      <td style={{ padding: '1rem', fontWeight: 700, color: '#0f172a' }}>{project.students?.length || 0}</td>
+                      <td style={{ padding: '1rem', fontWeight: 700, color: '#0f172a' }}>
+                        {Math.max(project.students?.length || 0, project.students_details?.length || 0)}
+                      </td>
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           <Link

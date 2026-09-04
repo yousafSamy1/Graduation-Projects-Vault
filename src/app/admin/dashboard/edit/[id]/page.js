@@ -214,13 +214,36 @@ export default function EditProjectPage({ params }) {
         }
       }
 
+      let finalDetails = [...form.students_details];
+      let finalNames = [...form.students];
+
+      if (studentForm.name.trim()) {
+        const pendingStudent = {
+          name: studentForm.name.trim(),
+          linkedin: studentForm.linkedin.trim() || null,
+          github: studentForm.github.trim() || null,
+          email: studentForm.email.trim() || null,
+          phone: studentForm.phone.trim() || null,
+          portfolio: studentForm.portfolio.trim() || null,
+        };
+        finalDetails.push(pendingStudent);
+        finalNames.push(pendingStudent.name);
+      }
+
+      const payload = {
+        ...form,
+        students_details: finalDetails,
+        students: finalNames,
+        pdf_url: pdfUrl,
+      };
+
       const res = await fetch(`/api/projects?id=${resolvedParams.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...form, pdf_url: pdfUrl }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
