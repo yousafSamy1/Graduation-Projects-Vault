@@ -4,7 +4,8 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap, Linkedin, Github, Mail, Phone, Globe } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap } from 'lucide-react';
+import { LinkedInIcon, GitHubIcon, EmailIcon, PhoneIcon, GlobeIcon } from '@/components/ContactIcons';
 import { getDepartmentLabel } from '@/lib/search';
 
 const departmentBadgeClass = {
@@ -258,7 +259,7 @@ export default function ProjectDetailPage({ params }) {
                             textDecoration: 'none'
                           }}
                         >
-                          <Linkedin size={14} /> LinkedIn
+                          <LinkedInIcon size={14} /> LinkedIn
                         </a>
                       )}
 
@@ -282,7 +283,7 @@ export default function ProjectDetailPage({ params }) {
                             textDecoration: 'none'
                           }}
                         >
-                          <Github size={14} /> GitHub
+                          <GitHubIcon size={14} /> GitHub
                         </a>
                       )}
 
@@ -304,7 +305,7 @@ export default function ProjectDetailPage({ params }) {
                             textDecoration: 'none'
                           }}
                         >
-                          <Mail size={14} /> Email
+                          <EmailIcon size={14} /> Email
                         </a>
                       )}
 
@@ -328,7 +329,7 @@ export default function ProjectDetailPage({ params }) {
                             textDecoration: 'none'
                           }}
                         >
-                          <Phone size={14} /> Contact
+                          <PhoneIcon size={14} /> Contact
                         </a>
                       )}
 
@@ -352,7 +353,7 @@ export default function ProjectDetailPage({ params }) {
                             textDecoration: 'none'
                           }}
                         >
-                          <Globe size={14} /> Website
+                          <GlobeIcon size={14} /> Website
                         </a>
                       )}
                     </div>

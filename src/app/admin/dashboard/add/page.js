@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import Footer from '@/components/Footer';
-import { Save, ArrowLeft, Loader, Plus, X, Sparkles, Linkedin, Github, Mail, Phone, Globe, Code, UserCheck } from 'lucide-react';
+import { Save, ArrowLeft, Loader, Plus, X, Sparkles, Code, UserCheck } from 'lucide-react';
+import { LinkedInIcon, GitHubIcon, EmailIcon, PhoneIcon, GlobeIcon } from '@/components/ContactIcons';
 import { DEPARTMENTS } from '@/lib/search';
 
 export default function AddProjectPage() {
@@ -512,27 +513,27 @@ export default function AddProjectPage() {
                         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '4px', flexWrap: 'wrap' }}>
                           {st.linkedin && (
                             <span style={{ fontSize: '0.75rem', color: '#0077b5', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
-                              <Linkedin size={12} /> LinkedIn
+                              <LinkedInIcon size={12} /> LinkedIn
                             </span>
                           )}
                           {st.github && (
                             <span style={{ fontSize: '0.75rem', color: '#333', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
-                              <Github size={12} /> GitHub
+                              <GitHubIcon size={12} /> GitHub
                             </span>
                           )}
                           {st.email && (
                             <span style={{ fontSize: '0.75rem', color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
-                              <Mail size={12} /> Email
+                              <EmailIcon size={12} /> Email
                             </span>
                           )}
                           {st.phone && (
                             <span style={{ fontSize: '0.75rem', color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
-                              <Phone size={12} /> Phone
+                              <PhoneIcon size={12} /> Phone
                             </span>
                           )}
                           {st.portfolio && (
                             <span style={{ fontSize: '0.75rem', color: '#2563eb', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
-                              <Globe size={12} /> Website
+                              <GlobeIcon size={12} /> Website
                             </span>
                           )}
                         </div>
