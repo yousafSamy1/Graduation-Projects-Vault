@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import Footer from '@/components/Footer';
-import { Save, ArrowLeft, Loader, Plus, X, Sparkles } from 'lucide-react';
+import { Save, ArrowLeft, Loader, Plus, X, Sparkles, Linkedin, Github, Mail, Phone, Globe, Code, UserCheck } from 'lucide-react';
 import { DEPARTMENTS } from '@/lib/search';
 
 export default function AddProjectPage() {
@@ -15,9 +15,18 @@ export default function AddProjectPage() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [keywordInput, setKeywordInput] = useState('');
-  const [studentInput, setStudentInput] = useState('');
+  
+  const [studentForm, setStudentForm] = useState({
+    name: '',
+    linkedin: '',
+    github: '',
+    email: '',
+    phone: '',
+    portfolio: '',
+  });
 
   const [form, setForm] = useState({
+    project_code: '',
     title_en: '',
     title_ar: '',
     abstract_en: '',
@@ -25,7 +34,9 @@ export default function AddProjectPage() {
     year: new Date().getFullYear(),
     department: '',
     students: [],
+    students_details: [],
     supervisor: '',
+    ta: '',
     keywords: [],
     rating: 0,
   });
@@ -55,16 +66,45 @@ export default function AddProjectPage() {
     updateField('keywords', form.keywords.filter((_, i) => i !== index));
   };
 
-  const addStudent = () => {
-    const student = studentInput.trim();
-    if (student && !form.students.includes(student)) {
-      updateField('students', [...form.students, student]);
-      setStudentInput('');
-    }
+  const addStudentDetail = () => {
+    if (!studentForm.name.trim()) return;
+
+    const newStudent = {
+      name: studentForm.name.trim(),
+      linkedin: studentForm.linkedin.trim() || null,
+      github: studentForm.github.trim() || null,
+      email: studentForm.email.trim() || null,
+      phone: studentForm.phone.trim() || null,
+      portfolio: studentForm.portfolio.trim() || null,
+    };
+
+    const updatedDetails = [...form.students_details, newStudent];
+    const updatedNames = updatedDetails.map((s) => s.name);
+
+    setForm((prev) => ({
+      ...prev,
+      students_details: updatedDetails,
+      students: updatedNames,
+    }));
+
+    setStudentForm({
+      name: '',
+      linkedin: '',
+      github: '',
+      email: '',
+      phone: '',
+      portfolio: '',
+    });
   };
 
-  const removeStudent = (index) => {
-    updateField('students', form.students.filter((_, i) => i !== index));
+  const removeStudentDetail = (index) => {
+    const updatedDetails = form.students_details.filter((_, i) => i !== index);
+    const updatedNames = updatedDetails.map((s) => s.name);
+    setForm((prev) => ({
+      ...prev,
+      students_details: updatedDetails,
+      students: updatedNames,
+    }));
   };
 
   const handlePDFExtract = async (file) => {
@@ -301,8 +341,24 @@ export default function AddProjectPage() {
               />
             </div>
 
-            {/* Department & Year */}
+            {/* Project Code & Department & Year */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              <div className="input-group">
+                <label htmlFor="project_code" style={{ color: '#0f172a', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Code size={16} style={{ color: '#1e3a8a' }} />
+                  Project Code (كود المشروع)
+                </label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. BT-2025-01"
+                  value={form.project_code}
+                  onChange={(e) => updateField('project_code', e.target.value)}
+                  id="project_code"
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
+                />
+              </div>
+
               <div className="input-group">
                 <label htmlFor="department" style={{ color: '#0f172a', fontWeight: 800 }}>Department *</label>
                 <select
@@ -337,51 +393,158 @@ export default function AddProjectPage() {
               </div>
             </div>
 
-            {/* Supervisor */}
-            <div className="input-group" style={{ marginBottom: '1.25rem' }}>
-              <label htmlFor="supervisor" style={{ color: '#0f172a', fontWeight: 800 }}>Supervisor</label>
-              <input
-                type="text"
-                className="input"
-                placeholder="Dr. ..."
-                value={form.supervisor}
-                onChange={(e) => updateField('supervisor', e.target.value)}
-                id="supervisor"
-                style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
-              />
-            </div>
-
-            {/* Students */}
-            <div className="input-group" style={{ marginBottom: '1.25rem' }}>
-              <label style={{ color: '#0f172a', fontWeight: 800 }}>Students</label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {/* Supervisor & Teaching Assistant (TA) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              <div className="input-group">
+                <label htmlFor="supervisor" style={{ color: '#0f172a', fontWeight: 800 }}>Supervisor (المشرف الاكاديمي)</label>
                 <input
                   type="text"
                   className="input"
-                  placeholder="Student name"
-                  value={studentInput}
-                  onChange={(e) => setStudentInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addStudent(); } }}
-                  id="student-input"
+                  placeholder="Dr. ..."
+                  value={form.supervisor}
+                  onChange={(e) => updateField('supervisor', e.target.value)}
+                  id="supervisor"
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
                 />
-                <button type="button" className="btn btn-secondary" onClick={addStudent}>
-                  <Plus size={16} />
-                </button>
               </div>
-              {form.students.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  {form.students.map((student, i) => (
-                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#eff6ff', border: '1.5px solid #bfdbfe', color: '#1e3a8a', padding: '4px 10px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700 }}>
-                      {student}
+
+              <div className="input-group">
+                <label htmlFor="ta" style={{ color: '#0f172a', fontWeight: 800 }}>Teaching Assistant / TA (المعيد)</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Eng. / Mr. / Ms. ..."
+                  value={form.ta}
+                  onChange={(e) => updateField('ta', e.target.value)}
+                  id="ta"
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
+                />
+              </div>
+            </div>
+
+            {/* Team Members with Contacts */}
+            <div style={{ background: '#f8fafc', border: '2px solid #cbd5e1', borderRadius: '1rem', padding: '1.25rem', marginBottom: '1.5rem' }}>
+              <label style={{ color: '#0f172a', fontWeight: 900, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem' }}>
+                <UserCheck size={18} style={{ color: '#059669' }} />
+                Team Members & Contact Info (أعضاء الفريق ووسائل التواصل)
+              </label>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Student Name *"
+                  value={studentForm.name}
+                  onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
+                />
+                <input
+                  type="url"
+                  className="input"
+                  placeholder="LinkedIn URL (https://...)"
+                  value={studentForm.linkedin}
+                  onChange={(e) => setStudentForm({ ...studentForm, linkedin: e.target.value })}
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
+                />
+                <input
+                  type="url"
+                  className="input"
+                  placeholder="GitHub URL (https://...)"
+                  value={studentForm.github}
+                  onChange={(e) => setStudentForm({ ...studentForm, github: e.target.value })}
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
+                />
+                <input
+                  type="email"
+                  className="input"
+                  placeholder="Email (student@example.com)"
+                  value={studentForm.email}
+                  onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
+                />
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Phone / WhatsApp (+2010...)"
+                  value={studentForm.phone}
+                  onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
+                />
+                <input
+                  type="url"
+                  className="input"
+                  placeholder="Portfolio / Website URL"
+                  value={studentForm.portfolio}
+                  onChange={(e) => setStudentForm({ ...studentForm, portfolio: e.target.value })}
+                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
+                />
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={addStudentDetail}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: 800 }}
+              >
+                <Plus size={16} />
+                Add Team Member to Project
+              </button>
+
+              {/* Added Members Cards Preview */}
+              {form.students_details.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
+                  {form.students_details.map((st, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: '#ffffff',
+                        border: '1.5px solid #bfdbfe',
+                        borderRadius: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>{st.name}</div>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '4px', flexWrap: 'wrap' }}>
+                          {st.linkedin && (
+                            <span style={{ fontSize: '0.75rem', color: '#0077b5', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
+                              <Linkedin size={12} /> LinkedIn
+                            </span>
+                          )}
+                          {st.github && (
+                            <span style={{ fontSize: '0.75rem', color: '#333', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
+                              <Github size={12} /> GitHub
+                            </span>
+                          )}
+                          {st.email && (
+                            <span style={{ fontSize: '0.75rem', color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
+                              <Mail size={12} /> Email
+                            </span>
+                          )}
+                          {st.phone && (
+                            <span style={{ fontSize: '0.75rem', color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
+                              <Phone size={12} /> Phone
+                            </span>
+                          )}
+                          {st.portfolio && (
+                            <span style={{ fontSize: '0.75rem', color: '#2563eb', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: 700 }}>
+                              <Globe size={12} /> Website
+                            </span>
+                          )}
+                        </div>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => removeStudent(i)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', padding: 0, display: 'flex' }}
+                        onClick={() => removeStudentDetail(i)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', padding: '4px' }}
                       >
-                        <X size={14} />
+                        <X size={16} />
                       </button>
-                    </span>
+                    </div>
                   ))}
                 </div>
               )}

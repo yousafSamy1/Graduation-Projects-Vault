@@ -4,7 +4,8 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap, Linkedin, Github, Mail, Phone, Globe } from 'lucide-react';
+import { getDepartmentLabel } from '@/lib/search';
 
 const departmentBadgeClass = {
   'MIS': 'badge-mis',
@@ -72,6 +73,11 @@ export default function ProjectDetailPage({ params }) {
 
   const title = project.title_en || project.title_ar || 'Untitled Project';
   const badgeClass = departmentBadgeClass[project.department] || 'badge-mis';
+  const departmentLabel = getDepartmentLabel(project.department);
+
+  const teamMembers = project.students_details && project.students_details.length > 0
+    ? project.students_details
+    : (project.students || []).map((name) => ({ name }));
 
   return (
     <>
@@ -100,9 +106,31 @@ export default function ProjectDetailPage({ params }) {
 
           {/* Header */}
           <div style={{ marginBottom: '2rem' }}>
-            <span className={`badge ${badgeClass}`} style={{ marginBottom: '1rem', display: 'inline-flex' }}>
-              {project.department}
-            </span>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              <span className={`badge ${badgeClass}`} style={{ display: 'inline-flex' }}>
+                {departmentLabel}
+              </span>
+
+              {project.project_code && (
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: '#f1f5f9',
+                  border: '1.5px solid #cbd5e1',
+                  color: '#0f172a',
+                  padding: '4px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 900,
+                  fontFamily: 'monospace'
+                }}>
+                  <Code size={14} style={{ color: '#1e3a8a' }} />
+                  {project.project_code}
+                </span>
+              )}
+            </div>
+
             <h1 style={{ fontSize: '2.25rem', fontWeight: 900, color: '#0f172a', lineHeight: 1.25, marginBottom: '0.75rem' }}>
               {title}
             </h1>
@@ -119,13 +147,24 @@ export default function ProjectDetailPage({ params }) {
 
             <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', fontSize: '0.9rem', fontWeight: 700, color: '#475569', flexWrap: 'wrap' }}>
               {project.year && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Calendar size={15} /> {project.year}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Calendar size={15} /> Academic Year: {project.year}
+                </span>
               )}
               {project.supervisor && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><User size={15} /> Supervisor: {project.supervisor}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <User size={15} style={{ color: '#1e3a8a' }} /> Supervisor: {project.supervisor}
+                </span>
+              )}
+              {project.ta && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <GraduationCap size={15} style={{ color: '#059669' }} /> TA (المعيد): {project.ta}
+                </span>
               )}
               {project.rating > 0 && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Star size={15} style={{ color: '#d97706' }} /> {project.rating}/5</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Star size={15} style={{ color: '#d97706' }} /> {project.rating}/5
+                </span>
               )}
             </div>
           </div>
@@ -150,17 +189,173 @@ export default function ProjectDetailPage({ params }) {
             </div>
           )}
 
-          {/* Students */}
-          {project.students && project.students.length > 0 && (
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 900, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Users size={18} style={{ color: '#059669' }} /> Team Members
+          {/* Team Members & Contact Cards */}
+          {teamMembers.length > 0 && (
+            <div style={{ marginBottom: '1.75rem' }}>
+              <h2 style={{ fontSize: '1.2rem', color: '#0f172a', fontWeight: 900, marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Users size={20} style={{ color: '#059669' }} /> Team Members (أعضاء الفريق)
               </h2>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-                {project.students.map((student, i) => (
-                  <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f1f5f9', border: '1.5px solid #cbd5e1', padding: '6px 14px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>
-                    <User size={14} />
-                    {student}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+                {teamMembers.map((member, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: '#f8fafc',
+                      border: '2px solid #cbd5e1',
+                      borderRadius: '0.88rem',
+                      padding: '1.1rem 1.25rem',
+                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '0.75rem'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '50%',
+                        background: '#e2e8f0',
+                        color: '#1e3a8a',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 900,
+                        fontSize: '1rem'
+                      }}>
+                        {member.name ? member.name.charAt(0).toUpperCase() : 'S'}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.05rem' }}>
+                          {member.name || 'Team Member'}
+                        </div>
+                        <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700 }}>
+                          Student Developer
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contact Icons Bar */}
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.5rem', borderTop: '1px solid #e2e8f0' }}>
+                      {member.linkedin && (
+                        <a
+                          href={member.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="LinkedIn Profile"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '4px 10px',
+                            background: '#0077b515',
+                            border: '1px solid #0077b540',
+                            borderRadius: '6px',
+                            color: '#0077b5',
+                            fontSize: '0.78rem',
+                            fontWeight: 800,
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <Linkedin size={14} /> LinkedIn
+                        </a>
+                      )}
+
+                      {member.github && (
+                        <a
+                          href={member.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="GitHub Profile"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '4px 10px',
+                            background: '#1e293b15',
+                            border: '1px solid #1e293b40',
+                            borderRadius: '6px',
+                            color: '#0f172a',
+                            fontSize: '0.78rem',
+                            fontWeight: 800,
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <Github size={14} /> GitHub
+                        </a>
+                      )}
+
+                      {member.email && (
+                        <a
+                          href={`mailto:${member.email}`}
+                          title="Send Email"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '4px 10px',
+                            background: '#dc262615',
+                            border: '1px solid #dc262640',
+                            borderRadius: '6px',
+                            color: '#dc2626',
+                            fontSize: '0.78rem',
+                            fontWeight: 800,
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <Mail size={14} /> Email
+                        </a>
+                      )}
+
+                      {member.phone && (
+                        <a
+                          href={`https://wa.me/${member.phone.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Call or WhatsApp"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '4px 10px',
+                            background: '#05966915',
+                            border: '1px solid #05966940',
+                            borderRadius: '6px',
+                            color: '#059669',
+                            fontSize: '0.78rem',
+                            fontWeight: 800,
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <Phone size={14} /> Contact
+                        </a>
+                      )}
+
+                      {member.portfolio && (
+                        <a
+                          href={member.portfolio}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Portfolio Website"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '4px 10px',
+                            background: '#2563eb15',
+                            border: '1px solid #2563eb40',
+                            borderRadius: '6px',
+                            color: '#2563eb',
+                            fontSize: '0.78rem',
+                            fontWeight: 800,
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <Globe size={14} /> Website
+                        </a>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

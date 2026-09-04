@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { User, BookOpen, ArrowRight } from 'lucide-react';
+import { User, BookOpen, ArrowRight, Code } from 'lucide-react';
+import { getDepartmentLabel } from '@/lib/search';
 
 const departmentBadgeClass = {
   'MIS': 'badge-mis',
@@ -14,6 +15,7 @@ export default function ProjectCard({ project, index = 0 }) {
   const title = project.title_en || project.title_ar || 'Untitled Project';
   const abstract = project.abstract_en || project.abstract_ar || '';
   const badgeClass = departmentBadgeClass[project.department] || 'badge-mis';
+  const departmentLabel = getDepartmentLabel(project.department);
 
   return (
     <Link
@@ -23,13 +25,21 @@ export default function ProjectCard({ project, index = 0 }) {
       id={`project-card-${project.id}`}
     >
       <div className="card-body">
-        <div className="project-card-header">
-          <span className={`badge ${badgeClass}`}>{project.department}</span>
-          {project.year && (
-            <span style={{ fontSize: '0.8rem', color: '#1e3a8a', fontWeight: 800 }}>
-              {project.year}
-            </span>
-          )}
+        <div className="project-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+          <span className={`badge ${badgeClass}`}>{departmentLabel}</span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {project.project_code && (
+              <span style={{ fontSize: '0.75rem', background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '4px', color: '#0f172a', fontWeight: 800, fontFamily: 'monospace' }}>
+                <Code size={10} style={{ display: 'inline', marginRight: '3px' }} />
+                {project.project_code}
+              </span>
+            )}
+            {project.year && (
+              <span style={{ fontSize: '0.8rem', color: '#1e3a8a', fontWeight: 800 }}>
+                {project.year}
+              </span>
+            )}
+          </div>
         </div>
 
         <h3 className="project-card-title" style={{ color: '#0f172a', fontWeight: 800 }}>{title}</h3>

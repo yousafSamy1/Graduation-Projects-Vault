@@ -143,7 +143,15 @@ function SearchPageContent() {
             <select
               className="select"
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
+              onChange={(e) => {
+                const newDept = e.target.value;
+                setDepartment(newDept);
+                const params = new URLSearchParams();
+                if (query) params.set('q', query);
+                if (newDept) params.set('department', newDept);
+                if (year) params.set('year', year);
+                router.push(`/search?${params.toString()}`);
+              }}
               style={{ width: 'auto', minWidth: 180, fontWeight: 700, color: '#0f172a', background: '#ffffff' }}
               id="filter-department"
             >
@@ -156,8 +164,16 @@ function SearchPageContent() {
             <select
               className="select"
               value={year}
-              onChange={(e) => setYear(e.target.value)}
-              style={{ width: 'auto', minWidth: 140, fontWeight: 700, color: '#0f172a', background: '#ffffff' }}
+              onChange={(e) => {
+                const newYr = e.target.value;
+                setYear(newYr);
+                const params = new URLSearchParams();
+                if (query) params.set('q', query);
+                if (department) params.set('department', department);
+                if (newYr) params.set('year', newYr);
+                router.push(`/search?${params.toString()}`);
+              }}
+              style={{ width: 'auto', minWidth: 120, fontWeight: 700, color: '#0f172a', background: '#ffffff' }}
               id="filter-year"
             >
               <option value="">All Years</option>
@@ -165,6 +181,40 @@ function SearchPageContent() {
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
+
+            {/* Quick Year Partition Pills */}
+            <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'wrap', marginLeft: 'auto' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748b' }}>Quick Year:</span>
+              {[2026, 2025, 2024, 2023].map((y) => (
+                <button
+                  key={y}
+                  type="button"
+                  onClick={() => {
+                    const newYr = y.toString() === year ? '' : y.toString();
+                    setYear(newYr);
+                    const params = new URLSearchParams();
+                    if (query) params.set('q', query);
+                    if (department) params.set('department', department);
+                    if (newYr) params.set('year', newYr);
+                    router.push(`/search?${params.toString()}`);
+                  }}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: '1.5px solid',
+                    borderColor: year === y.toString() ? '#1e3a8a' : '#cbd5e1',
+                    background: year === y.toString() ? '#1e3a8a' : '#f8fafc',
+                    color: year === y.toString() ? '#ffffff' : '#0f172a',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {y}
+                </button>
+              ))}
+            </div>
 
             {(query || department || year) && (
               <button

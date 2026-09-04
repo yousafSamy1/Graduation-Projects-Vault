@@ -89,8 +89,8 @@ export function getSimilarityLevel(percentage) {
  */
 export const DEPARTMENTS = [
   { value: 'MIS', label: 'Management Information Systems', labelAr: 'نظم المعلومات الإدارية' },
-  { value: 'BA', label: 'Business Analysis', labelAr: 'تحليل الأعمال' },
-  { value: 'Fintech', label: 'Financial Technology', labelAr: 'التكنولوجيا المالية' },
+  { value: 'BA', label: 'Business Analytics', labelAr: 'تحليلات الأعمال' },
+  { value: 'Fintech', label: 'Digital Banking and Fintech', labelAr: 'البنوك الرقمية والتكنولوجيا المالية' },
   { value: 'Marketing Intelligence', label: 'Marketing Intelligence', labelAr: 'ذكاء التسويق' },
 ];
 

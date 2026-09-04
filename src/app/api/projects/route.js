@@ -69,15 +69,23 @@ export async function POST(request) {
       console.warn('Embedding skipped or failed:', embError.message);
     }
 
+    // Auto-extract simple student names list from students_details if needed
+    const studentNames = body.students_details && body.students_details.length > 0
+      ? body.students_details.map((s) => typeof s === 'string' ? s : s.name).filter(Boolean)
+      : (body.students || []);
+
     const projectData = {
+      project_code: body.project_code || null,
       title_en: body.title_en || null,
       title_ar: body.title_ar || null,
       abstract_en: body.abstract_en || null,
       abstract_ar: body.abstract_ar || null,
       year: body.year,
       department: body.department,
-      students: body.students || [],
+      students: studentNames,
+      students_details: body.students_details || [],
       supervisor: body.supervisor || null,
+      ta: body.ta || null,
       keywords: body.keywords || [],
       pdf_url: body.pdf_url || null,
       rating: body.rating || 0,

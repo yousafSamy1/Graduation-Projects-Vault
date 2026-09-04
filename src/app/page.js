@@ -10,8 +10,8 @@ import { Search, GitCompareArrows, ArrowRight, Award } from 'lucide-react';
 
 const DEPARTMENTS = [
   { id: 'MIS', nameEn: 'Management Information Systems', nameAr: 'نظم المعلومات الإدارية', color: '#dc2626', icon: '💻' },
-  { id: 'BA', nameEn: 'Business Administration', nameAr: 'إدارة الأعمال', color: '#d97706', icon: '📊' },
-  { id: 'Fintech', nameEn: 'Financial Technology', nameAr: 'التكنولوجيا المالية', color: '#059669', icon: '💳' },
+  { id: 'BA', nameEn: 'Business Analytics', nameAr: 'تحليلات الأعمال', color: '#d97706', icon: '📊' },
+  { id: 'Fintech', nameEn: 'Digital Banking and Fintech', nameAr: 'البنوك الرقمية والتكنولوجيا المالية', color: '#059669', icon: '💳' },
   { id: 'Marketing Intelligence', nameEn: 'Marketing Intelligence', nameAr: 'ذكاء التسويق', color: '#2563eb', icon: '🎯' },
 ];
 
@@ -36,6 +36,8 @@ export default function HomePage() {
     }
     fetchData();
   }, []);
+
+  const yearsList = [2026, 2025, 2024, 2023, 2022, 2021];
 
   return (
     <>
@@ -70,7 +72,7 @@ export default function HomePage() {
                 <img src="/logo.png" alt="ERU Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <span style={{ fontSize: '0.9rem', color: '#1e3a8a', fontWeight: 800 }}>
-                Egyptian Russian University • Faculty of Management & Business Tech
+                Egyptian Russian University • Business Technology Department
               </span>
             </div>
           </div>
@@ -108,7 +110,8 @@ export default function HomePage() {
               display: 'flex', 
               justifyContent: 'center', 
               flexWrap: 'wrap', 
-              gap: '1rem' 
+              gap: '1rem',
+              marginBottom: '2rem'
             }}>
               <Link href="/search" className="btn btn-primary btn-lg" id="hero-search-btn">
                 <Search size={18} />
@@ -119,6 +122,46 @@ export default function HomePage() {
                 Compare Idea (AI)
               </Link>
             </div>
+
+            {/* Browse By Academic Year Quick Partition Bar */}
+            <div className="animate-fade-in-up" style={{
+              background: '#ffffff',
+              border: '2px solid #cbd5e1',
+              borderRadius: '1rem',
+              padding: '1rem 1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.75rem',
+              flexWrap: 'wrap',
+              boxShadow: '0 4px 15px rgba(15, 23, 42, 0.06)'
+            }}>
+              <span style={{ fontWeight: 900, color: '#0f172a', fontSize: '0.95rem' }}>
+                📅 Browse by Year / تصفح حسب السنة:
+              </span>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {yearsList.map((y) => (
+                  <Link
+                    key={y}
+                    href={`/search?year=${y}`}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '9999px',
+                      background: '#f1f5f9',
+                      border: '1.5px solid #cbd5e1',
+                      color: '#1e3a8a',
+                      fontWeight: 800,
+                      fontSize: '0.88rem',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {y}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
           </div>
 
           {/* Department Cards Grid */}

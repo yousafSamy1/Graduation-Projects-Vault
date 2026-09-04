@@ -44,7 +44,7 @@ export default function Footer() {
                 Egyptian Russian University
               </div>
               <div style={{ fontSize: '11px', color: '#dc2626', fontWeight: 700 }}>
-                Faculty of Management & Business Tech
+                Faculty of Management & Business Tech • Business Technology Dept.
               </div>
             </div>
           </div>

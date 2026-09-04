@@ -10,6 +10,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- ============================================
 CREATE TABLE IF NOT EXISTS projects (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    project_code TEXT,                      -- كود المشروع (e.g. BT-2025-01)
     title_ar TEXT,                          -- العنوان بالعربي
     title_en TEXT,                          -- العنوان بالإنجليزي
     abstract_ar TEXT,                       -- الملخص بالعربي
@@ -18,7 +19,9 @@ CREATE TABLE IF NOT EXISTS projects (
     department TEXT NOT NULL                -- القسم
         CHECK (department IN ('MIS', 'BA', 'Fintech', 'Marketing Intelligence')),
     students TEXT[] DEFAULT '{}',           -- أسماء الطلاب
+    students_details JSONB DEFAULT '[]'::jsonb, -- تفاصيل الطلاب وروابط التواصل
     supervisor TEXT,                        -- اسم المشرف
+    ta TEXT,                                -- اسم المعيد (Teaching Assistant)
     keywords TEXT[] DEFAULT '{}',           -- كلمات مفتاحية
     pdf_url TEXT,                           -- رابط ملف PDF في Supabase Storage
     rating DECIMAL(2,1) DEFAULT 0           -- تقييم (0-5)

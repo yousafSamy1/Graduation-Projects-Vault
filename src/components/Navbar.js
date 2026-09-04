@@ -46,6 +46,9 @@ export default function Navbar() {
             <span style={{ fontSize: '11px', color: '#dc2626', fontWeight: 700, fontFamily: 'Inter, sans-serif' }}>
               Faculty of Management, Economics & Business Technology
             </span>
+            <span style={{ fontSize: '10.5px', color: '#1e3a8a', fontWeight: 800, fontFamily: 'Inter, sans-serif', marginTop: '1px' }}>
+              Business Technology Department
+            </span>
           </div>
         </Link>
 
