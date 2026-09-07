@@ -187,18 +187,17 @@ export default function AddProjectPage() {
 
       // Upload image if selected
       let imageUrl = form.image_url;
-      if (imageFile && !imageUrl) {
+      if (imageFile) {
         setUploadingImage(true);
         const imgForm = new FormData();
         imgForm.append('file', imageFile);
-        try {
-          const imgRes = await fetch('/api/upload-image', { method: 'POST', body: imgForm });
-          if (imgRes.ok) {
-            const imgData = await imgRes.json();
-            imageUrl = imgData.image_url;
-          }
-        } catch (imgErr) {
-          console.warn('Image upload failed:', imgErr);
+        const imgRes = await fetch('/api/upload-image', { method: 'POST', body: imgForm });
+        if (imgRes.ok) {
+          const imgData = await imgRes.json();
+          imageUrl = imgData.image_url;
+        } else {
+          const imgErrData = await imgRes.json().catch(() => ({}));
+          throw new Error(`Image upload failed: ${imgErrData.error || 'Server error'}`);
         }
         setUploadingImage(false);
       }
