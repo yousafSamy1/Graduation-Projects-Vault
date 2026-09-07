@@ -1,11 +1,22 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient, createPublicSupabaseClient } from '@/lib/supabase';
+import { DEPARTMENTS } from '@/lib/search';
+
+function normalizeDepartment(val) {
+  if (!val) return '';
+  const trimmed = val.trim();
+  const match = DEPARTMENTS.find(
+    (d) => d.value.toLowerCase() === trimmed.toLowerCase() || d.label.toLowerCase() === trimmed.toLowerCase()
+  );
+  return match ? match.value : trimmed;
+}
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
-    const department = searchParams.get('department') || '';
+    const rawDept = searchParams.get('department') || searchParams.get('dept') || '';
+    const department = normalizeDepartment(rawDept);
     const year = searchParams.get('year') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '12');

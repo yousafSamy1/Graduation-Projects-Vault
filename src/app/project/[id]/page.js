@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap, Video, ExternalLink } from 'lucide-react';
 import { LinkedInIcon, GitHubIcon, EmailIcon, PhoneIcon, GlobeIcon } from '@/components/ContactIcons';
 import { getDepartmentLabel } from '@/lib/search';
 
@@ -169,6 +169,32 @@ export default function ProjectDetailPage({ params }) {
               )}
             </div>
           </div>
+
+          {/* Project Cover Image */}
+          {project.image_url && (
+            <div style={{
+              width: '100%',
+              maxHeight: '420px',
+              borderRadius: '1rem',
+              overflow: 'hidden',
+              marginBottom: '1.75rem',
+              border: '2px solid #cbd5e1',
+              boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
+              background: '#f8fafc',
+            }}>
+              <img
+                src={project.image_url}
+                alt={title}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  maxHeight: '420px',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+            </div>
+          )}
 
           {/* Abstract English */}
           {project.abstract_en && (
@@ -370,6 +396,92 @@ export default function ProjectDetailPage({ params }) {
               </div>
             </div>
           )}
+
+          {/* Project Video (Google Drive / YouTube) */}
+          {project.drive_url && (() => {
+            const rawUrl = project.drive_url.trim();
+            
+            // Check YouTube
+            const ytMatch = rawUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+            
+            // Check Google Drive
+            let driveId = null;
+            const fileDMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (fileDMatch) driveId = fileDMatch[1];
+            const idParamMatch = rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (idParamMatch) driveId = idParamMatch[1];
+
+            let embedUrl = rawUrl;
+            let openUrl = rawUrl;
+            let isDrive = false;
+
+            if (ytMatch && ytMatch[1]) {
+              embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=0&rel=0`;
+              openUrl = `https://www.youtube.com/watch?v=${ytMatch[1]}`;
+            } else if (driveId) {
+              embedUrl = `https://drive.google.com/file/d/${driveId}/preview`;
+              openUrl = `https://drive.google.com/file/d/${driveId}/view`;
+              isDrive = true;
+            } else if (rawUrl.includes('drive.google.com')) {
+              embedUrl = rawUrl.replace('/view', '/preview');
+              isDrive = true;
+            }
+
+            return (
+              <div style={{ marginBottom: '1.75rem' }}>
+                <h2 style={{ fontSize: '1.2rem', color: '#0f172a', fontWeight: 900, marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Video size={20} style={{ color: '#dc2626' }} /> Project Demo Video
+                </h2>
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  paddingBottom: '56.25%', /* 16:9 */
+                  borderRadius: '1rem',
+                  overflow: 'hidden',
+                  background: '#0f172a',
+                  border: '2px solid #cbd5e1',
+                  boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
+                }}>
+                  <iframe
+                    src={embedUrl}
+                    style={{
+                      position: 'absolute',
+                      top: 0, left: 0,
+                      width: '100%', height: '100%',
+                      border: 'none',
+                    }}
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                    title="Project Demo Video"
+                  />
+                </div>
+                <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                  {isDrive && (
+                    <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+                      Note: If video asks to sign in, ensure Google Drive file is set to &ldquo;Anyone with the link&rdquo;.
+                    </span>
+                  )}
+                  <a
+                    href={openUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '0.85rem',
+                      color: '#1e3a8a',
+                      fontWeight: 800,
+                      textDecoration: 'none',
+                      marginLeft: 'auto'
+                    }}
+                  >
+                    <ExternalLink size={14} /> Open Video in New Tab
+                  </a>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Keywords */}
           {project.keywords && project.keywords.length > 0 && (

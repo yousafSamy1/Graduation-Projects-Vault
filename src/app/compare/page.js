@@ -2,45 +2,32 @@
 
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import FileUpload from '@/components/FileUpload';
 import SimilarityResult from '@/components/SimilarityResult';
 import Footer from '@/components/Footer';
-import { GitCompareArrows, FileText, Loader, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
+import { GitCompareArrows, Loader, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
 
 export default function ComparePage() {
-  const [mode, setMode] = useState('text'); // 'text' or 'pdf'
   const [abstractText, setAbstractText] = useState('');
-  const [file, setFile] = useState(null);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasCompared, setHasCompared] = useState(false);
 
   const handleCompare = async () => {
+    if (!abstractText.trim()) {
+      setError('Please provide an abstract or project idea text.');
+      return;
+    }
+
     setError('');
     setLoading(true);
     setHasCompared(true);
 
     try {
-      let body;
-      let headers = {};
-
-      if (mode === 'pdf' && file) {
-        body = new FormData();
-        body.append('file', file);
-      } else if (mode === 'text' && abstractText.trim()) {
-        body = JSON.stringify({ text: abstractText.trim() });
-        headers['Content-Type'] = 'application/json';
-      } else {
-        setError('Please provide an abstract text or upload a PDF file.');
-        setLoading(false);
-        return;
-      }
-
       const res = await fetch('/api/compare', {
         method: 'POST',
-        headers,
-        body,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: abstractText.trim() }),
       });
 
       if (!res.ok) {
@@ -96,60 +83,28 @@ export default function ComparePage() {
               Compare Your <span className="text-gradient">Idea</span>
             </h1>
             <p style={{ color: '#1e293b', fontWeight: 700, maxWidth: 540, margin: '0 auto', fontSize: '1.05rem' }}>
-              Paste your abstract or upload a PDF to check if a similar project already exists in our database.
+              Paste your abstract or project idea to check if a similar project already exists in our database.
             </p>
           </div>
 
-          {/* Mode Toggle */}
-          <div className="animate-fade-in-up" style={{ 
-            display: 'flex', 
-            gap: '0.5rem', 
-            marginBottom: '1.5rem',
-            background: '#f8fafc',
-            padding: '0.5rem',
-            borderRadius: '1rem',
-            border: '2px solid #cbd5e1'
-          }}>
-            <button
-              className={`btn ${mode === 'text' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setMode('text')}
-              style={{ flex: 1 }}
-              id="mode-text-btn"
-            >
-              <FileText size={16} />
-              Paste Abstract
-            </button>
-            <button
-              className={`btn ${mode === 'pdf' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setMode('pdf')}
-              style={{ flex: 1 }}
-              id="mode-pdf-btn"
-            >
-              <FileText size={16} />
-              Upload PDF
-            </button>
-          </div>
-
-          {/* Input Section */}
+          {/* Input Section (Text Only) */}
           <div className="animate-fade-in-up" style={{ marginBottom: '1.5rem' }}>
-            {mode === 'text' ? (
-              <div className="input-group">
-                <label htmlFor="abstract-textarea">Your Abstract / Project Idea</label>
-                <textarea
-                  className="textarea"
-                  placeholder="Paste your project abstract here... (Arabic or English)&#10;&#10;اكتب ملخص مشروعك هنا..."
-                  value={abstractText}
-                  onChange={(e) => setAbstractText(e.target.value)}
-                  style={{ minHeight: 200 }}
-                  id="abstract-textarea"
-                />
-                <p style={{ fontSize: '0.85rem', color: '#475569', marginTop: '0.5rem', fontWeight: 700 }}>
-                  {abstractText.length} characters
-                </p>
-              </div>
-            ) : (
-              <FileUpload onFileSelect={setFile} />
-            )}
+            <div className="input-group">
+              <label htmlFor="abstract-textarea" style={{ fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem', display: 'block' }}>
+                Your Abstract / Project Idea (ملخص الفكرة أو المشروع)
+              </label>
+              <textarea
+                className="textarea"
+                placeholder="Paste your project abstract here... (Arabic or English)&#10;&#10;اكتب ملخص فكرة مشروعك هنا باللغة العربية أو الإنجليزية..."
+                value={abstractText}
+                onChange={(e) => setAbstractText(e.target.value)}
+                style={{ minHeight: 180, fontSize: '0.98rem' }}
+                id="abstract-textarea"
+              />
+              <p style={{ fontSize: '0.85rem', color: '#475569', marginTop: '0.5rem', fontWeight: 700 }}>
+                {abstractText.length} characters
+              </p>
+            </div>
           </div>
 
           {/* Error */}
@@ -176,7 +131,7 @@ export default function ComparePage() {
           <button
             className="btn btn-accent btn-lg"
             onClick={handleCompare}
-            disabled={loading || (mode === 'text' && !abstractText.trim()) || (mode === 'pdf' && !file)}
+            disabled={loading || !abstractText.trim()}
             style={{ width: '100%', marginBottom: '2.5rem' }}
             id="compare-btn"
           >

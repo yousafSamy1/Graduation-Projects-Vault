@@ -5,31 +5,39 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import SearchBar from '@/components/SearchBar';
-import ProjectCard from '@/components/ProjectCard';
+import ProjectsBanner from '@/components/ProjectsBanner';
 import Footer from '@/components/Footer';
-import { Search, GitCompareArrows, ArrowRight, Award, Calendar } from 'lucide-react';
+import { Search, GitCompareArrows, ArrowRight, Award, Calendar, Monitor, BarChart3, CreditCard, Target } from 'lucide-react';
 
 const DEPARTMENTS = [
-  { id: 'MIS', nameEn: 'Management Information Systems', nameAr: 'نظم المعلومات الإدارية', color: '#dc2626', icon: '💻' },
-  { id: 'BA', nameEn: 'Business Analytics', nameAr: 'تحليلات الأعمال', color: '#d97706', icon: '📊' },
-  { id: 'Fintech', nameEn: 'Digital Banking and Fintech', nameAr: 'البنوك الرقمية والتكنولوجيا المالية', color: '#059669', icon: '💳' },
-  { id: 'Marketing Intelligence', nameEn: 'Marketing Intelligence', nameAr: 'ذكاء التسويق', color: '#2563eb', icon: '🎯' },
+  { id: 'MIS', nameEn: 'Management Information Systems', nameAr: 'نظم المعلومات الإدارية', color: '#dc2626', Icon: Monitor },
+  { id: 'BA', nameEn: 'Business Analytics', nameAr: 'تحليلات الأعمال', color: '#d97706', Icon: BarChart3 },
+  { id: 'Fintech', nameEn: 'Digital Banking and Fintech', nameAr: 'البنوك الرقمية والتكنولوجيا المالية', color: '#059669', Icon: CreditCard },
+  { id: 'Marketing Intelligence', nameEn: 'Marketing Intelligence', nameAr: 'ذكاء التسويق', color: '#2563eb', Icon: Target },
 ];
 
 export default function HomePage() {
   const router = useRouter();
   const [stats, setStats] = useState({ total: 0, departments: 4, years: 0, supervisors: 0 });
   const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('/api/stats');
-        if (res.ok) {
-          const data = await res.json();
+        const [statsRes, projectsRes] = await Promise.all([
+          fetch('/api/stats'),
+          fetch('/api/projects?pageSize=50'),
+        ]);
+        if (statsRes.ok) {
+          const data = await statsRes.json();
           setStats(data.stats || { total: 0, departments: 4, years: 0, supervisors: 0 });
           setFeaturedProjects(data.featured || []);
+        }
+        if (projectsRes.ok) {
+          const pData = await projectsRes.json();
+          setAllProjects(pData.projects || []);
         }
       } catch (err) {
         console.log('Stats not available yet');
@@ -127,58 +135,67 @@ export default function HomePage() {
 
           </div>
 
-          {/* Department Cards Grid */}
+          {/* Department Display Cards (Static Showcase - Non-clickable) */}
           <div style={{ 
-            marginTop: '3.5rem', 
+            marginTop: '3rem', 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
             gap: '1.25rem' 
           }}>
-            {DEPARTMENTS.map((dept) => (
-              <Link 
-                key={dept.id} 
-                href={`/search?dept=${encodeURIComponent(dept.id)}`} 
-                style={{ textDecoration: 'none' }}
-              >
-                <div className="card" style={{ 
-                  padding: '1.25rem', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '1rem',
-                  background: '#ffffff',
-                  border: `2px solid ${dept.color}`,
-                  boxShadow: '0 6px 20px rgba(15, 23, 42, 0.08)'
-                }}>
+            {DEPARTMENTS.map((dept) => {
+              const IconComp = dept.Icon;
+              return (
+                <div 
+                  key={dept.id} 
+                  className="card" 
+                  style={{ 
+                    padding: '1.15rem 1.25rem', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '1rem',
+                    background: '#ffffff',
+                    border: `2px solid ${dept.color}`,
+                    boxShadow: '0 6px 20px rgba(15, 23, 42, 0.08)',
+                    cursor: 'default',
+                    userSelect: 'none',
+                    minHeight: '86px',
+                    height: '100%'
+                  }}
+                >
                   <div style={{ 
-                    fontSize: '24px', 
                     width: '46px', 
                     height: '46px', 
                     borderRadius: '12px', 
                     background: `${dept.color}15`,
                     display: 'flex', 
                     alignItems: 'center', 
-                    justifyContent: 'center' 
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    color: dept.color
                   }}>
-                    {dept.icon}
+                    <IconComp size={24} />
                   </div>
-                  <div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>
                       {dept.id}
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: '#1e293b', fontWeight: 700 }}>
+                    <div style={{ fontSize: '0.8rem', color: '#1e293b', fontWeight: 700, marginTop: '2px', lineHeight: 1.3 }}>
                       {dept.nameEn}
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
 
         </div>
       </section>
 
-      {/* Stats Section (Video visible in background, cards are solid white) */}
-      <section className="section" id="stats-section" style={{ padding: '3rem 0', position: 'relative', zIndex: 5 }}>
+      {/* ─── Projects Banner (auto-scrolling carousel) ─── */}
+      <ProjectsBanner projects={allProjects.length > 0 ? allProjects : featuredProjects} />
+
+      {/* Stats Section (Directly under Projects Banner) */}
+      <section className="section" id="stats-section" style={{ padding: '2.5rem 0', position: 'relative', zIndex: 5 }}>
         <div className="container">
           <div className="stats-grid">
             <div className="card stat-card" style={{ borderTop: '4px solid #dc2626', background: '#ffffff', boxShadow: '0 6px 20px rgba(15, 23, 42, 0.08)' }}>
@@ -201,7 +218,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section (Video visible in background, cards are solid white) */}
       <section className="section" id="features-section" style={{ padding: '4rem 0', position: 'relative', zIndex: 5 }}>
         <div className="container">
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '3rem' }}>
@@ -287,28 +303,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Featured Projects */}
-      {featuredProjects.length > 0 && (
-        <section className="section" id="featured-section" style={{ padding: '4rem 0', position: 'relative', zIndex: 5 }}>
-          <div className="container">
-            <div className="section-header" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-              <h2 style={{ color: '#0f172a', fontWeight: 900, fontSize: '2.25rem' }}>Recent <span className="text-gradient">Graduation Projects</span></h2>
-              <p style={{ color: '#1e293b', fontWeight: 700, fontSize: '1.05rem' }}>Explore top featured projects from our departments</p>
-            </div>
-            <div className="projects-grid">
-              {featuredProjects.slice(0, 6).map((project, i) => (
-                <ProjectCard key={project.id} project={project} index={i} />
-              ))}
-            </div>
-            <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-              <Link href="/search" className="btn btn-secondary btn-lg" id="view-all-btn">
-                View All Projects <ArrowRight size={18} />
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       <Footer />
     </>

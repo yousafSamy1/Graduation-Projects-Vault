@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import FileUpload from '@/components/FileUpload';
 import Footer from '@/components/Footer';
-import { Save, ArrowLeft, Loader, Plus, X, Sparkles, Code, UserCheck } from 'lucide-react';
+import { Save, ArrowLeft, Loader, Plus, X, Sparkles, Code, UserCheck, Image } from 'lucide-react';
 import { LinkedInIcon, GitHubIcon, EmailIcon, PhoneIcon, GlobeIcon } from '@/components/ContactIcons';
 import { DEPARTMENTS } from '@/lib/search';
 
@@ -21,9 +21,9 @@ export default function EditProjectPage({ params }) {
 
   const [studentForm, setStudentForm] = useState({
     name: '',
+    student_id: '',
     linkedin: '',
     github: '',
-    email: '',
     phone: '',
     portfolio: '',
   });
@@ -40,12 +40,17 @@ export default function EditProjectPage({ params }) {
     students_details: [],
     supervisor: '',
     ta: '',
+    drive_url: '',
+    image_url: '',
     keywords: [],
     rating: 0,
     pdf_url: '',
   });
 
   const [pdfFile, setPdfFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -77,10 +82,16 @@ export default function EditProjectPage({ params }) {
               students_details: details,
               supervisor: p.supervisor || '',
               ta: p.ta || '',
+              drive_url: p.drive_url || '',
+              image_url: p.image_url || '',
               keywords: p.keywords || [],
               rating: p.rating || 0,
               pdf_url: p.pdf_url || '',
             });
+
+            if (p.image_url) {
+              setImagePreview(p.image_url);
+            }
           }
         }
       } catch (err) {
@@ -111,14 +122,20 @@ export default function EditProjectPage({ params }) {
   const addStudentDetail = () => {
     if (!studentForm.name.trim()) return;
 
+    // Auto-build ERU email from student ID
+    const builtEmail = studentForm.student_id.trim()
+      ? `${studentForm.student_id.trim()}@eru.edu.eg`
+      : null;
+
     const newStudent = {
       name: studentForm.name.trim(),
+      email: builtEmail,
       linkedin: studentForm.linkedin.trim() || null,
       github: studentForm.github.trim() || null,
-      email: studentForm.email.trim() || null,
       phone: studentForm.phone.trim() || null,
       portfolio: studentForm.portfolio.trim() || null,
     };
+    Object.keys(newStudent).forEach((k) => newStudent[k] === null && delete newStudent[k]);
 
     const updatedDetails = [...form.students_details, newStudent];
     const updatedNames = updatedDetails.map((s) => s.name);
@@ -214,18 +231,40 @@ export default function EditProjectPage({ params }) {
         }
       }
 
+      // Upload image if selected
+      let imageUrl = form.image_url;
+      if (imageFile) {
+        setUploadingImage(true);
+        const imgForm = new FormData();
+        imgForm.append('file', imageFile);
+        try {
+          const imgRes = await fetch('/api/upload-image', { method: 'POST', body: imgForm });
+          if (imgRes.ok) {
+            const imgData = await imgRes.json();
+            imageUrl = imgData.image_url;
+          }
+        } catch (imgErr) {
+          console.warn('Image upload failed:', imgErr);
+        }
+        setUploadingImage(false);
+      }
+
       let finalDetails = [...form.students_details];
       let finalNames = [...form.students];
 
       if (studentForm.name.trim()) {
+        const builtEmail = studentForm.student_id?.trim()
+          ? `${studentForm.student_id.trim()}@eru.edu.eg`
+          : null;
         const pendingStudent = {
           name: studentForm.name.trim(),
+          email: builtEmail,
           linkedin: studentForm.linkedin.trim() || null,
           github: studentForm.github.trim() || null,
-          email: studentForm.email.trim() || null,
           phone: studentForm.phone.trim() || null,
           portfolio: studentForm.portfolio.trim() || null,
         };
+        Object.keys(pendingStudent).forEach((k) => pendingStudent[k] === null && delete pendingStudent[k]);
         finalDetails.push(pendingStudent);
         finalNames.push(pendingStudent.name);
       }
@@ -235,6 +274,7 @@ export default function EditProjectPage({ params }) {
         students_details: finalDetails,
         students: finalNames,
         pdf_url: pdfUrl,
+        image_url: imageUrl || form.image_url || null,
       };
 
       const res = await fetch(`/api/projects?id=${resolvedParams.id}`, {
@@ -499,6 +539,76 @@ export default function EditProjectPage({ params }) {
               </div>
             </div>
 
+            {/* Project Image Upload */}
+            <div className="input-group" style={{ marginBottom: '1.25rem' }}>
+              <label style={{ color: '#0f172a', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                <Image size={16} style={{ color: '#7c3aed' }} />
+                Project Image (صورة المشروع - اختياري)
+              </label>
+              {imagePreview ? (
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{
+                      width: '100%',
+                      maxWidth: '320px',
+                      height: '180px',
+                      objectFit: 'cover',
+                      borderRadius: '10px',
+                      border: '2px solid #cbd5e1',
+                      display: 'block',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setImageFile(null); setImagePreview(null); updateField('image_url', ''); }}
+                    style={{
+                      position: 'absolute', top: '6px', right: '6px',
+                      background: 'rgba(0,0,0,0.7)', color: 'white',
+                      border: 'none', borderRadius: '50%',
+                      width: '24px', height: '24px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', fontSize: '14px',
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ) : (
+                <label
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    justifyContent: 'center', gap: '8px',
+                    border: '2px dashed #a78bfa',
+                    borderRadius: '10px',
+                    padding: '1.5rem',
+                    cursor: 'pointer',
+                    background: '#f5f3ff',
+                    transition: 'all 0.2s',
+                  }}
+                  htmlFor="image-upload-input"
+                >
+                  <Image size={28} style={{ color: '#7c3aed' }} />
+                  <span style={{ fontWeight: 800, color: '#7c3aed', fontSize: '0.9rem' }}>Click to upload / replace project image</span>
+                  <span style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 700 }}>PNG, JPG, WebP up to 5MB</span>
+                  <input
+                    type="file"
+                    id="image-upload-input"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImageFile(file);
+                        setImagePreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+
             {/* Team Members with Contacts */}
             <div style={{ background: '#f8fafc', border: '2px solid #cbd5e1', borderRadius: '1rem', padding: '1.25rem', marginBottom: '1.5rem' }}>
               <div style={{ marginBottom: '1rem' }}>
@@ -520,10 +630,25 @@ export default function EditProjectPage({ params }) {
                   onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
                 />
+                {/* University ID → auto-builds @eru.edu.eg email */}
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="University ID (e.g. 224256)"
+                    value={studentForm.student_id}
+                    onChange={(e) => setStudentForm({ ...studentForm, student_id: e.target.value.replace(/\D/g, '') })}
+                    style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700, paddingRight: '130px' }}
+                  />
+                  <span style={{
+                    position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
+                    fontSize: '0.78rem', color: '#059669', fontWeight: 800, pointerEvents: 'none'
+                  }}>@eru.edu.eg</span>
+                </div>
                 <input
                   type="url"
                   className="input"
-                  placeholder="LinkedIn (optional - اختياري)"
+                  placeholder="LinkedIn (optional)"
                   value={studentForm.linkedin}
                   onChange={(e) => setStudentForm({ ...studentForm, linkedin: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
@@ -531,23 +656,15 @@ export default function EditProjectPage({ params }) {
                 <input
                   type="url"
                   className="input"
-                  placeholder="GitHub (optional - اختياري)"
+                  placeholder="GitHub (optional)"
                   value={studentForm.github}
                   onChange={(e) => setStudentForm({ ...studentForm, github: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
                 />
                 <input
-                  type="email"
-                  className="input"
-                  placeholder="Email (optional - اختياري)"
-                  value={studentForm.email}
-                  onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
-                  style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
-                />
-                <input
                   type="text"
                   className="input"
-                  placeholder="Phone / WhatsApp (optional - اختياري)"
+                  placeholder="Phone / WhatsApp (optional)"
                   value={studentForm.phone}
                   onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
@@ -555,7 +672,7 @@ export default function EditProjectPage({ params }) {
                 <input
                   type="url"
                   className="input"
-                  placeholder="Portfolio / Website (optional - اختياري)"
+                  placeholder="Portfolio / Website (optional)"
                   value={studentForm.portfolio}
                   onChange={(e) => setStudentForm({ ...studentForm, portfolio: e.target.value })}
                   style={{ background: '#ffffff', color: '#0f172a', fontWeight: 600 }}
@@ -664,6 +781,27 @@ export default function EditProjectPage({ params }) {
                     </span>
                   ))}
                 </div>
+              )}
+            </div>
+
+            {/* Drive URL */}
+            <div className="input-group" style={{ marginBottom: '1.25rem' }}>
+              <label htmlFor="drive-url" style={{ color: '#0f172a', fontWeight: 800 }}>
+                🎬 Google Drive Video URL (رابط فيديو المشروع - اختياري)
+              </label>
+              <input
+                type="url"
+                className="input"
+                placeholder="https://drive.google.com/file/d/... or /open?id=..."
+                value={form.drive_url}
+                onChange={(e) => updateField('drive_url', e.target.value)}
+                id="drive-url"
+                style={{ background: '#ffffff', color: '#0f172a', fontWeight: 700 }}
+              />
+              {form.drive_url && (
+                <p style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700, marginTop: '4px' }}>
+                  ✓ Drive link - will show as embedded video on project page
+                </p>
               )}
             </div>
 

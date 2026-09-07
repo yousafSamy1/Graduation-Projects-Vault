@@ -29,12 +29,21 @@ export async function GET(request) {
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    const { data, error, count } = await supabase
+    const dept = searchParams.get('dept');
+
+    let query = supabase
       .from('projects')
       .select('*', { count: 'exact' })
       .order('year', { ascending: false })
-      .order('created_at', { ascending: false })
-      .range(from, to);
+      .order('created_at', { ascending: false });
+
+    if (dept) {
+      query = query.eq('department', dept);
+    }
+
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
 
     if (error) {
       console.error('Fetch projects error:', error);
@@ -88,6 +97,8 @@ export async function POST(request) {
       ta: body.ta || null,
       keywords: body.keywords || [],
       pdf_url: body.pdf_url || null,
+      drive_url: body.drive_url || null,
+      image_url: body.image_url || null,
       rating: body.rating || 0,
       embedding: embedding,
     };
@@ -167,6 +178,8 @@ export async function PUT(request) {
       ta: body.ta || null,
       keywords: body.keywords || [],
       pdf_url: body.pdf_url || null,
+      drive_url: body.drive_url || null,
+      image_url: body.image_url || null,
       rating: body.rating || 0,
     };
 

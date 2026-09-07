@@ -8,12 +8,22 @@ import Footer from '@/components/Footer';
 import { Search, Filter, X, Loader, FolderOpen } from 'lucide-react';
 import { DEPARTMENTS } from '@/lib/search';
 
+function normalizeDepartment(val) {
+  if (!val) return '';
+  const trimmed = val.trim();
+  const match = DEPARTMENTS.find(
+    (d) => d.value.toLowerCase() === trimmed.toLowerCase() || d.label.toLowerCase() === trimmed.toLowerCase()
+  );
+  return match ? match.value : trimmed;
+}
+
 function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const rawDeptInit = searchParams.get('department') || searchParams.get('dept') || '';
   const [query, setQuery] = useState(searchParams.get('q') || '');
-  const [department, setDepartment] = useState(searchParams.get('department') || '');
+  const [department, setDepartment] = useState(normalizeDepartment(rawDeptInit));
   const [year, setYear] = useState(searchParams.get('year') || '');
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,7 +58,8 @@ function SearchPageContent() {
 
   useEffect(() => {
     const q = searchParams.get('q') || '';
-    const dept = searchParams.get('department') || '';
+    const rawDept = searchParams.get('department') || searchParams.get('dept') || '';
+    const dept = normalizeDepartment(rawDept);
     const yr = searchParams.get('year') || '';
     setQuery(q);
     setDepartment(dept);
