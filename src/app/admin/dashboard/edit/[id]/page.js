@@ -332,7 +332,7 @@ export default function EditProjectPage({ params }) {
         }}>
           <button
             className="btn btn-ghost"
-            onClick={() => router.back()}
+            onClick={() => router.push('/admin/dashboard')}
             style={{ marginBottom: '1.5rem', color: '#0f172a', fontWeight: 800 }}
           >
             <ArrowLeft size={16} />

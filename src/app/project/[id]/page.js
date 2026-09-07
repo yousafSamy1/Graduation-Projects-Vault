@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap, Video, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap, Video, ExternalLink, ShieldCheck, Edit3, LayoutDashboard } from 'lucide-react';
 import { LinkedInIcon, GitHubIcon, EmailIcon, PhoneIcon, GlobeIcon } from '@/components/ContactIcons';
 import { getDepartmentLabel } from '@/lib/search';
 
@@ -19,6 +19,12 @@ export default function ProjectDetailPage({ params }) {
   const resolvedParams = use(params);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('admin_token');
+    setIsAdmin(!!token);
+  }, []);
 
   useEffect(() => {
     async function fetchProject() {
@@ -94,16 +100,64 @@ export default function ProjectDetailPage({ params }) {
           position: 'relative',
           zIndex: 10
         }}>
-          {/* Back Button */}
-          <Link
-            href="/search"
-            className="btn btn-ghost"
-            style={{ marginBottom: '1.5rem' }}
-            id="back-to-search"
-          >
-            <ArrowLeft size={16} />
-            Back to Search
-          </Link>
+          {/* Admin Control Banner if logged in */}
+          {isAdmin && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              background: '#eff6ff',
+              border: '2px solid #93c5fd',
+              borderRadius: '0.85rem',
+              padding: '0.85rem 1.25rem',
+              marginBottom: '1.5rem',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1e40af', fontWeight: 800, fontSize: '0.92rem' }}>
+                <ShieldCheck size={20} />
+                Administrator Mode: Full privileges active
+              </div>
+              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                <Link
+                  href={`/admin/dashboard/edit/${project.id}`}
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Edit3 size={14} /> Edit This Project
+                </Link>
+                <Link
+                  href="/admin/dashboard"
+                  className="btn btn-secondary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <LayoutDashboard size={14} /> Admin Dashboard
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+            <Link
+              href="/search"
+              className="btn btn-ghost"
+              id="back-to-search"
+            >
+              <ArrowLeft size={16} />
+              Back to Search
+            </Link>
+
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="btn btn-ghost"
+                style={{ color: '#1e40af', fontWeight: 800 }}
+              >
+                <LayoutDashboard size={16} /> Back to Dashboard
+              </Link>
+            )}
+          </div>
 
           {/* Header */}
           <div style={{ marginBottom: '2rem' }}>

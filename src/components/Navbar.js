@@ -2,19 +2,29 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { Home, Search, GitCompareArrows, Shield, Menu, X } from 'lucide-react';
-
-const navLinks = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/search', label: 'Search Projects', icon: Search },
-  { href: '/compare', label: 'Compare Idea', icon: GitCompareArrows },
-  { href: '/admin', label: 'Admin', icon: Shield },
-];
+import { useState, useEffect } from 'react';
+import { Home, Search, GitCompareArrows, Shield, ShieldCheck, Menu, X } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('admin_token');
+    setIsAdmin(!!token);
+  }, [pathname]);
+
+  const navLinks = [
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/search', label: 'Search Projects', icon: Search },
+    { href: '/compare', label: 'Compare Idea', icon: GitCompareArrows },
+    { 
+      href: isAdmin ? '/admin/dashboard' : '/admin', 
+      label: isAdmin ? 'Dashboard' : 'Admin', 
+      icon: isAdmin ? ShieldCheck : Shield 
+    },
+  ];
 
   return (
     <nav className="navbar" id="main-navbar">
