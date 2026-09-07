@@ -26,7 +26,7 @@ export default function ProjectsBanner({ projects = [] }) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const intervalRef = useRef(null);
 
-  const displayProjects = projects.slice(0, 12); // max 12 in banner
+  const displayProjects = projects; // Show all projects from all departments
 
   const goTo = (index) => {
     if (isTransitioning) return;
@@ -341,7 +341,7 @@ export default function ProjectsBanner({ projects = [] }) {
         </div>
 
         {/* Dots navigation */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '6px', marginTop: '1rem', maxWidth: '750px', marginLeft: 'auto', marginRight: 'auto' }}>
           {displayProjects.map((_, i) => (
             <button
               key={i}
