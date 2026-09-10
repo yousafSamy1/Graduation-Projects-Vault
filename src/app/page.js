@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar';
 import SearchBar from '@/components/SearchBar';
 import ProjectsBanner from '@/components/ProjectsBanner';
 import Footer from '@/components/Footer';
-import { Search, GitCompareArrows, ArrowRight, Award, Calendar, Monitor, BarChart3, CreditCard, Target } from 'lucide-react';
+import { Search, GitCompareArrows, ArrowRight, Award, Calendar, Monitor, BarChart3, CreditCard, Target, Newspaper, ExternalLink } from 'lucide-react';
 
 const DEPARTMENTS = [
   { id: 'MIS', nameEn: 'Management Information Systems', nameAr: 'نظم المعلومات الإدارية', color: '#dc2626', Icon: Monitor },
@@ -111,8 +111,44 @@ export default function HomePage() {
             </p>
             
             {/* Search Bar */}
-            <div className="animate-fade-in-up" style={{ marginBottom: '2rem' }}>
+            <div className="animate-fade-in-up" style={{ marginBottom: '1.25rem' }}>
               <SearchBar size="large" />
+            </div>
+
+            {/* 📰 Press Feature Banner */}
+            <div className="animate-fade-in-up" style={{ marginBottom: '1.5rem' }}>
+              <a
+                href="https://www.gomhuriaonline.com/Gomhuria/1680077.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                id="press-banner-link"
+                className="press-banner"
+              >
+                {/* Icon */}
+                <div className="press-banner__icon">
+                  <Newspaper size={22} />
+                </div>
+
+                {/* Content */}
+                <div className="press-banner__content">
+                  <div className="press-banner__label">
+                    <span className="press-banner__label-dot" />
+                    Media Coverage
+                  </div>
+                  <div className="press-banner__title">
+                    كلية الإدارة بالجامعة الروسية المصرية تقدم خريجين لوظائف المستقبل
+                  </div>
+                  <div className="press-banner__meta">
+                    <span className="press-banner__source">
+                      <Newspaper size={12} className="press-banner__source-icon" />
+                      بوابة الجمهورية
+                    </span>
+                    <span className="press-banner__cta">
+                      Read Article <ArrowRight size={12} />
+                    </span>
+                  </div>
+                </div>
+              </a>
             </div>
 
             {/* Quick Actions */}
