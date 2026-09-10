@@ -1,29 +1,53 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Home, Search, GitCompareArrows, Shield, ShieldCheck, Menu, X } from 'lucide-react';
+import { Home, Search, GitCompareArrows, Shield, ShieldCheck, LogOut, Menu, X } from 'lucide-react';
+import { checkIsAdmin, logoutAdmin } from '@/lib/clientAuth';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const verifySession = async () => {
+    const valid = await checkIsAdmin();
+    setIsAdmin(valid);
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    setIsAdmin(!!token);
+    verifySession();
+
+    const handleAuthChange = () => {
+      verifySession();
+    };
+
+    window.addEventListener('admin_auth_changed', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('admin_auth_changed', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
   }, [pathname]);
+
+  const handleLogout = () => {
+    logoutAdmin();
+    setIsAdmin(false);
+    setIsOpen(false);
+    if (pathname.startsWith('/admin/dashboard')) {
+      router.push('/admin');
+    } else {
+      router.refresh();
+    }
+  };
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/search', label: 'Search Projects', icon: Search },
     { href: '/compare', label: 'Compare Idea', icon: GitCompareArrows },
-    { 
-      href: isAdmin ? '/admin/dashboard' : '/admin', 
-      label: isAdmin ? 'Dashboard' : 'Admin', 
-      icon: isAdmin ? ShieldCheck : Shield 
-    },
   ];
 
   return (
@@ -74,6 +98,58 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
+
+          {/* Admin link or Dashboard + Logout */}
+          {isAdmin ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <Link
+                href="/admin/dashboard"
+                className={`navbar-link ${pathname.startsWith('/admin/dashboard') ? 'active' : ''}`}
+                style={{
+                  background: '#eff6ff',
+                  color: '#1d4ed8',
+                  border: '1.5px solid #bfdbfe',
+                  borderRadius: '0.6rem',
+                  padding: '0.4rem 0.75rem',
+                  fontWeight: 800,
+                }}
+                onClick={() => setIsOpen(false)}
+              >
+                <ShieldCheck size={16} color="#2563eb" />
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="btn btn-sm"
+                style={{
+                  background: '#fee2e2',
+                  color: '#dc2626',
+                  border: '1.5px solid #fca5a5',
+                  borderRadius: '0.6rem',
+                  padding: '0.4rem 0.75rem',
+                  cursor: 'pointer',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '0.85rem'
+                }}
+                title="Log out of Admin mode"
+              >
+                <LogOut size={14} />
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/admin"
+              className={`navbar-link ${pathname === '/admin' ? 'active' : ''}`}
+              onClick={() => setIsOpen(false)}
+            >
+              <Shield size={16} />
+              Admin
+            </Link>
+          )}
         </div>
 
         <button

@@ -1,6 +1,16 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
 export default function BackgroundVideo() {
+  const [loadVideo, setLoadVideo] = useState(false);
+
+  useEffect(() => {
+    // Delay video load until after the page has painted
+    const timer = setTimeout(() => setLoadVideo(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div 
       style={{
@@ -15,21 +25,25 @@ export default function BackgroundVideo() {
       }}
       aria-hidden="true"
     >
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          opacity: 0.45,
-          filter: 'brightness(1.02) contrast(1.05)'
-        }}
-      >
-        <source src="/bg-video.mp4" type="video/mp4" />
-      </video>
+      {loadVideo && (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: 0.45,
+            filter: 'brightness(1.02) contrast(1.05)',
+            transition: 'opacity 0.8s ease',
+          }}
+        >
+          <source src="/bg-video.mp4" type="video/mp4" />
+        </video>
+      )}
       
       {/* Light Overlay keeping background video visible across the entire page layout */}
       <div 

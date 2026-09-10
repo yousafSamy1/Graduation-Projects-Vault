@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient, createPublicSupabaseClient } from '@/lib/supabase';
 import { generateEmbedding, combineTextForEmbedding } from '@/lib/openai';
+import { verifyAdminRequest } from '@/lib/auth';
 
 // GET - Fetch projects (with optional single project by id)
 export async function GET(request) {
@@ -30,10 +31,16 @@ export async function GET(request) {
     const to = from + pageSize - 1;
 
     const dept = searchParams.get('dept');
+    const exclude = searchParams.get('exclude');
+
+    // If exclude=embedding, select all columns except embedding for lighter payloads
+    const selectColumns = exclude === 'embedding'
+      ? 'id,project_code,title_en,title_ar,abstract_en,abstract_ar,year,department,students,students_details,supervisor,ta,keywords,pdf_url,drive_url,image_url,rating,created_at'
+      : '*';
 
     let query = supabase
       .from('projects')
-      .select('*', { count: 'exact' })
+      .select(selectColumns, { count: 'exact' })
       .order('year', { ascending: false })
       .order('created_at', { ascending: false });
 
@@ -50,12 +57,16 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 });
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       projects: data || [],
       total: count || 0,
       page,
       pageSize,
     });
+
+    // Cache listing responses for 60 seconds
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    return response;
   } catch (err) {
     console.error('Projects GET error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -65,6 +76,11 @@ export async function GET(request) {
 // POST - Create a new project (Admin only)
 export async function POST(request) {
   try {
+    const auth = await verifyAdminRequest(request);
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status || 401 });
+    }
+
     const body = await request.json();
 
     // Safely attempt embedding generation
@@ -142,6 +158,11 @@ export async function POST(request) {
 // PUT - Update an existing project (Admin only)
 export async function PUT(request) {
   try {
+    const auth = await verifyAdminRequest(request);
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status || 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     const body = await request.json();
@@ -222,6 +243,11 @@ export async function PUT(request) {
 // DELETE - Delete a project (Admin only)
 export async function DELETE(request) {
   try {
+    const auth = await verifyAdminRequest(request);
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status || 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

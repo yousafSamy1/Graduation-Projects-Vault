@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Plus, Trash2, LogOut, Search, Loader, FolderOpen, Download, Edit } from 'lucide-react';
+import { checkIsAdmin, logoutAdmin } from '@/lib/clientAuth';
 
 const departmentBadgeClass = {
   'MIS': 'badge-mis',
@@ -22,12 +23,15 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    if (!token) {
-      router.push('/admin');
-      return;
+    async function init() {
+      const isValid = await checkIsAdmin();
+      if (!isValid) {
+        router.push('/admin');
+        return;
+      }
+      fetchProjects();
     }
-    fetchProjects();
+    init();
   }, [router]);
 
   const fetchProjects = async () => {
@@ -64,8 +68,7 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_email');
+    logoutAdmin();
     router.push('/admin');
   };
 

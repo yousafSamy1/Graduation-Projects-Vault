@@ -20,6 +20,11 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (adminEmail && data.user?.email?.toLowerCase() !== adminEmail.toLowerCase().trim()) {
+      return NextResponse.json({ error: 'Access denied: You do not have administrator privileges' }, { status: 403 });
+    }
+
     return NextResponse.json({
       token: data.session?.access_token,
       user: {

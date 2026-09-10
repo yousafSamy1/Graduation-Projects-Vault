@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { Save, ArrowLeft, Loader, Plus, X, Sparkles, Code, UserCheck, Image } from 'lucide-react';
 import { LinkedInIcon, GitHubIcon, EmailIcon, PhoneIcon, GlobeIcon } from '@/components/ContactIcons';
 import { DEPARTMENTS } from '@/lib/search';
+import { checkIsAdmin } from '@/lib/clientAuth';
 
 export default function EditProjectPage({ params }) {
   const resolvedParams = use(params);
@@ -53,10 +54,13 @@ export default function EditProjectPage({ params }) {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    if (!token) {
-      router.push('/admin');
-      return;
+    async function init() {
+      const isValid = await checkIsAdmin();
+      if (!isValid) {
+        router.push('/admin');
+        return;
+      }
+      loadProject();
     }
 
     async function loadProject() {
@@ -224,7 +228,11 @@ export default function EditProjectPage({ params }) {
       if (pdfFile && !pdfUrl) {
         const formData = new FormData();
         formData.append('file', pdfFile);
-        const uploadRes = await fetch('/api/upload-pdf', { method: 'POST', body: formData });
+        const uploadRes = await fetch('/api/upload-pdf', { 
+          method: 'POST', 
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData 
+        });
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           pdfUrl = uploadData.pdf_url;
@@ -237,7 +245,11 @@ export default function EditProjectPage({ params }) {
         setUploadingImage(true);
         const imgForm = new FormData();
         imgForm.append('file', imageFile);
-        const imgRes = await fetch('/api/upload-image', { method: 'POST', body: imgForm });
+        const imgRes = await fetch('/api/upload-image', { 
+          method: 'POST', 
+          headers: { Authorization: `Bearer ${token}` },
+          body: imgForm 
+        });
         if (imgRes.ok) {
           const imgData = await imgRes.json();
           imageUrl = imgData.image_url;

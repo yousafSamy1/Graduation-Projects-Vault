@@ -28,7 +28,7 @@ export default function HomePage() {
       try {
         const [statsRes, projectsRes] = await Promise.all([
           fetch('/api/stats'),
-          fetch('/api/projects?pageSize=200'),
+          fetch('/api/projects?pageSize=30&exclude=embedding'),
         ]);
         if (statsRes.ok) {
           const data = await statsRes.json();

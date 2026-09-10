@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { ArrowLeft, Calendar, User, Users, BookOpen, Download, Tag, Star, Loader, Code, GraduationCap, Video, ExternalLink, ShieldCheck, Edit3, LayoutDashboard } from 'lucide-react';
 import { LinkedInIcon, GitHubIcon, EmailIcon, PhoneIcon, GlobeIcon } from '@/components/ContactIcons';
 import { getDepartmentLabel } from '@/lib/search';
+import { checkIsAdmin } from '@/lib/clientAuth';
 
 const departmentBadgeClass = {
   'MIS': 'badge-mis',
@@ -22,8 +23,18 @@ export default function ProjectDetailPage({ params }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    setIsAdmin(!!token);
+    async function verifyAdmin() {
+      const valid = await checkIsAdmin();
+      setIsAdmin(valid);
+    }
+    verifyAdmin();
+
+    const handleAuthChange = () => {
+      verifyAdmin();
+    };
+
+    window.addEventListener('admin_auth_changed', handleAuthChange);
+    return () => window.removeEventListener('admin_auth_changed', handleAuthChange);
   }, []);
 
   useEffect(() => {
