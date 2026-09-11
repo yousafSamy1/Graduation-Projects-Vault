@@ -3,6 +3,10 @@ import { createServerSupabaseClient, createPublicSupabaseClient } from '@/lib/su
 import { generateEmbedding, combineTextForEmbedding } from '@/lib/openai';
 import { verifyAdminRequest } from '@/lib/auth';
 
+// Columns safe for display — never include the heavy embedding vector in list responses
+const DISPLAY_COLUMNS =
+  'id,project_code,title_en,title_ar,abstract_en,abstract_ar,year,department,students,students_details,supervisor,ta,keywords,pdf_url,drive_url,image_url,rating,created_at';
+
 // GET - Fetch projects (with optional single project by id)
 export async function GET(request) {
   try {
@@ -14,9 +18,10 @@ export async function GET(request) {
     const supabase = createPublicSupabaseClient();
 
     if (id) {
+      // Single project fetch — return everything
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
+        .select(DISPLAY_COLUMNS)
         .eq('id', id)
         .single();
 
@@ -24,23 +29,19 @@ export async function GET(request) {
         return NextResponse.json({ error: 'Project not found' }, { status: 404 });
       }
 
-      return NextResponse.json({ project: data });
+      const response = NextResponse.json({ project: data });
+      response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+      return response;
     }
 
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
     const dept = searchParams.get('dept');
-    const exclude = searchParams.get('exclude');
-
-    // If exclude=embedding, select all columns except embedding for lighter payloads
-    const selectColumns = exclude === 'embedding'
-      ? 'id,project_code,title_en,title_ar,abstract_en,abstract_ar,year,department,students,students_details,supervisor,ta,keywords,pdf_url,drive_url,image_url,rating,created_at'
-      : '*';
 
     let query = supabase
       .from('projects')
-      .select(selectColumns, { count: 'exact' })
+      .select(DISPLAY_COLUMNS, { count: 'exact' })
       .order('year', { ascending: false })
       .order('created_at', { ascending: false });
 
@@ -64,8 +65,8 @@ export async function GET(request) {
       pageSize,
     });
 
-    // Cache listing responses for 60 seconds
-    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    // Cache listing responses for 2 minutes, stale-while-revalidate for 5 minutes
+    response.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
     return response;
   } catch (err) {
     console.error('Projects GET error:', err);
@@ -123,7 +124,7 @@ export async function POST(request) {
     let { data, error } = await supabase
       .from('projects')
       .insert([projectData])
-      .select()
+      .select(DISPLAY_COLUMNS)
       .single();
 
     // Fallback to public client if service key throws an API key error
@@ -133,7 +134,7 @@ export async function POST(request) {
       const res = await supabase
         .from('projects')
         .insert([projectData])
-        .select()
+        .select(DISPLAY_COLUMNS)
         .single();
       data = res.data;
       error = res.error;
@@ -213,7 +214,7 @@ export async function PUT(request) {
       .from('projects')
       .update(updateData)
       .eq('id', id)
-      .select()
+      .select(DISPLAY_COLUMNS)
       .single();
 
     if (error && (error.message?.includes('Invalid API key') || error.code === 'PGRST301')) {
@@ -222,7 +223,7 @@ export async function PUT(request) {
         .from('projects')
         .update(updateData)
         .eq('id', id)
-        .select()
+        .select(DISPLAY_COLUMNS)
         .single();
       data = res.data;
       error = res.error;

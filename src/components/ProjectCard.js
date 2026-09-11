@@ -60,6 +60,8 @@ export default function ProjectCard({ project, index = 0 }) {
           <img
             src={project.image_url}
             alt={title}
+            loading="lazy"
+            decoding="async"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (

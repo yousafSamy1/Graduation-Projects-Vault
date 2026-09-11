@@ -20,24 +20,16 @@ export default function HomePage() {
   const router = useRouter();
   const [stats, setStats] = useState({ total: 0, departments: 4, years: 0, supervisors: 0 });
   const [featuredProjects, setFeaturedProjects] = useState([]);
-  const [allProjects, setAllProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [statsRes, projectsRes] = await Promise.all([
-          fetch('/api/stats'),
-          fetch('/api/projects?pageSize=30&exclude=embedding'),
-        ]);
+        const statsRes = await fetch('/api/stats');
         if (statsRes.ok) {
           const data = await statsRes.json();
           setStats(data.stats || { total: 0, departments: 4, years: 0, supervisors: 0 });
           setFeaturedProjects(data.featured || []);
-        }
-        if (projectsRes.ok) {
-          const pData = await projectsRes.json();
-          setAllProjects(pData.projects || []);
         }
       } catch (err) {
         console.log('Stats not available yet');
@@ -228,7 +220,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── Projects Banner (auto-scrolling carousel) ─── */}
-      <ProjectsBanner projects={allProjects.length > 0 ? allProjects : featuredProjects} />
+      <ProjectsBanner projects={featuredProjects} />
 
       {/* Stats Section (Directly under Projects Banner) */}
       <section className="section" id="stats-section" style={{ padding: '2.5rem 0', position: 'relative', zIndex: 5 }}>

@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createServerSupabaseClient, createPublicSupabaseClient } from '@/lib/supabase';
+import { createPublicSupabaseClient } from '@/lib/supabase';
 import { DEPARTMENTS } from '@/lib/search';
+
+// Columns safe for display — never return the heavy embedding vector
+const DISPLAY_COLUMNS =
+  'id,project_code,title_en,title_ar,abstract_en,abstract_ar,year,department,students,students_details,supervisor,ta,keywords,pdf_url,drive_url,image_url,rating,created_at';
 
 function normalizeDepartment(val) {
   if (!val) return '';
@@ -25,7 +29,7 @@ export async function GET(request) {
 
     let dbQuery = supabase
       .from('projects')
-      .select('*', { count: 'exact' });
+      .select(DISPLAY_COLUMNS, { count: 'exact' });
 
     // Apply text search across title, abstract, supervisor, project_code, and TA
     if (query.trim()) {
@@ -58,13 +62,17 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Search failed' }, { status: 500 });
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       projects: data || [],
       total: count || 0,
       page,
       pageSize,
       totalPages: Math.ceil((count || 0) / pageSize),
     });
+
+    // Cache search results — short TTL so updates appear quickly, stale-while-revalidate keeps it snappy
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    return response;
   } catch (err) {
     console.error('Search API error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
